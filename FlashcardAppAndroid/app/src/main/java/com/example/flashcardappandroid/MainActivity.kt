@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.flashcardappandroid.ui.screen.LoginScreen
 import com.example.flashcardappandroid.ui.screen.RegisterScreen
+import com.example.flashcardappandroid.ui.screen.HomeScreen
 import com.example.flashcardappandroid.ui.theme.FlashcardAppAndroidTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,6 +20,7 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = "login") {
                     composable("login") { LoginScreen(navController) }
                     composable("register") { RegisterScreen(navController) }
+                    composable("home") { HomeScreen(navController) } // Thêm dòng này
                 }
             }
         }

@@ -44,6 +44,7 @@ fun LoginScreen(navController: NavController) {
                         if (tokens != null) {
                             TokenManager(context).saveTokens(tokens.accessToken, tokens.refreshToken)
                             Toast.makeText(context, "Login success!", Toast.LENGTH_SHORT).show()
+                            navController.navigate("home") // Chuyển đến HomeScreen
                         }
                     } else {
                         Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show()
