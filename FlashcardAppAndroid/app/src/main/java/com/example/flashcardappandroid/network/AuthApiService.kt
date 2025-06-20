@@ -8,13 +8,13 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 
 interface AuthApiService {
-    @POST("api/users/log-in")
+    @POST("api/users/login")
     suspend fun login(@Body body: LoginRequest): Response<AuthResponse>
 
     @POST("api/users/register")
     suspend fun register(@Body body: RegisterRequest): Response<AuthResponse>
 
-    @POST("api/users/log-out")
+    @POST("api/users/logout")
     suspend fun logOut(
         @Body body: RequestBody,
         @Header("Authorization") token: String
