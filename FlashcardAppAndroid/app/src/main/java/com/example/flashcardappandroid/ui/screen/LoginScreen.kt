@@ -22,42 +22,71 @@ fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(32.dp)
     ) {
-        Text("Login", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(24.dp))
-        OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(value = password, onValueChange = { password = it }, label = { Text("Password") })
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            coroutineScope.launch {
-                try {
-                    val response = RetrofitClient.api.login(LoginRequest(email, password))
-                    if (response.isSuccessful) {
-                        val tokens = response.body()
-                        if (tokens != null) {
-                            TokenManager(context).saveTokens(tokens.accessToken, tokens.refreshToken)
-                            Toast.makeText(context, "Login success!", Toast.LENGTH_SHORT).show()
-                            navController.navigate("home") // Chuyển đến HomeScreen
+        // Phần chính (ở giữa màn hình)
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Login", style = MaterialTheme.typography.headlineMedium)
+            Spacer(modifier = Modifier.height(24.dp))
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Password") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        try {
+                            val response = RetrofitClient.api.login(LoginRequest(email, password))
+                            if (response.isSuccessful) {
+                                val loginResponse = response.body()
+                                if (loginResponse != null) {
+                                    TokenManager(context).saveTokens(
+                                        loginResponse.data.accessToken,
+                                        loginResponse.data.refreshToken,
+                                        loginResponse.data.id
+                                    )
+                                    Toast.makeText(context, "Login success!", Toast.LENGTH_SHORT).show()
+                                    navController.navigate("home")
+                                }
+                            } else {
+                                Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                         }
-                    } else {
-                        Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show()
                     }
-                } catch (e: Exception) {
-                    Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Login")
             }
-        }) {
-            Text("Login")
+            Spacer(modifier = Modifier.height(16.dp))
+            TextButton(onClick = { navController.navigate("forgot-password") }) {
+                Text("Forgot password?")
+            }
         }
-        Spacer(modifier = Modifier.height(12.dp))
-        TextButton(onClick = { navController.navigate("register") }) {
+
+        // Phần "Don't have an account?" (ở dưới cùng)
+        TextButton(
+            onClick = { navController.navigate("register") },
+            modifier = Modifier.align(Alignment.BottomCenter) // Căn dưới cùng
+        ) {
             Text("Don't have an account? Register")
         }
     }

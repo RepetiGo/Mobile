@@ -8,8 +8,7 @@ import androidx.navigation.NavController
 import com.example.flashcardappandroid.data.TokenManager
 import com.example.flashcardappandroid.network.RetrofitClient
 import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
+import com.example.flashcardappandroid.data.LogOutRequest
 
 @Composable
 fun ProfileScreen(navController: NavController) {
@@ -23,11 +22,9 @@ fun ProfileScreen(navController: NavController) {
                 val accessToken = tokenManager.getAccessToken()
                 val refreshToken = tokenManager.getRefreshToken()
                 if (accessToken != null && refreshToken != null) {
-                    val json = """{"refreshToken":"$refreshToken"}"""
-                    val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
                     val response = RetrofitClient.api.logOut(
-                        body = requestBody,
-                        token = "Bearer $accessToken"
+                        LogOutRequest(refreshToken),
+                        "Bearer $accessToken"
                     )
                     if (response.isSuccessful) {
                         tokenManager.clearTokens()
@@ -41,7 +38,7 @@ fun ProfileScreen(navController: NavController) {
                 } else {
                     Toast.makeText(context, "Không tìm thấy token", Toast.LENGTH_SHORT).show()
                 }
-            } catch (e: Exception) {
+            }    catch (e: Exception) {
                 Toast.makeText(context, "Lỗi: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }

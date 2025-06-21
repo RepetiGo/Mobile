@@ -6,13 +6,18 @@ import androidx.activity.compose.setContent
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.flashcardappandroid.network.RetrofitClient
 import com.example.flashcardappandroid.ui.screen.LoginScreen
 import com.example.flashcardappandroid.ui.screen.RegisterScreen
 import com.example.flashcardappandroid.ui.screen.HomeScreen
+import com.example.flashcardappandroid.ui.screen.VerifyScreen
+import com.example.flashcardappandroid.ui.screen.ForgotPasswordScreen
+import com.example.flashcardappandroid.ui.screen.ResetPasswordScreen
 import com.example.flashcardappandroid.ui.theme.FlashcardAppAndroidTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        RetrofitClient.init(applicationContext)
         super.onCreate(savedInstanceState)
         setContent {
             FlashcardAppAndroidTheme {
@@ -21,6 +26,12 @@ class MainActivity : ComponentActivity() {
                     composable("login") { LoginScreen(navController) }
                     composable("register") { RegisterScreen(navController) }
                     composable("home") { HomeScreen(navController) } // Thêm dòng này
+                    composable("verify/{email}") { backStackEntry ->
+                        val email = backStackEntry.arguments?.getString("email") ?: ""
+                        VerifyScreen(navController, email)
+                    }
+                    composable("forgot-password") { ForgotPasswordScreen(navController) }
+                    composable("reset-password") { ResetPasswordScreen(navController) }
                 }
             }
         }
