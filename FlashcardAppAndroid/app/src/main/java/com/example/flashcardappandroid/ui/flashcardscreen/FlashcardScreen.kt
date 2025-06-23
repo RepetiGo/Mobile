@@ -2,6 +2,7 @@ package com.example.flashcardappandroid.ui.flashcardscreen
 
 import DeckListViewModel
 import android.widget.Toast
+import androidx.compose.animation.animateContentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -21,8 +22,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,17 +34,22 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -56,14 +64,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.window.Dialog
 import com.example.flashcardappandroid.data.CreateDeckRequest
 import com.example.flashcardappandroid.data.TokenManager
 import com.example.flashcardappandroid.network.RetrofitClient
 import kotlinx.coroutines.launch
-
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,93 +93,513 @@ fun DeckListScreen(
     val context = LocalContext.current
     val deckList = viewModel.deckList
     val coroutineScope = rememberCoroutineScope()
+    var isRefreshing by remember { mutableStateOf(false) }
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
 
     LaunchedEffect(Unit) {
         viewModel.loadDecksIfNeeded(context)
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Flashcard") },
-                actions = {
-                    IconButton(onClick = {
-                        showAddDeckDialog = true
-                    }) {
-                        Icon(Icons.Default.Add, contentDescription = "Add")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF94D5F5),
-                    titleContentColor = Color(0xFF191647)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF94D5F5).copy(alpha = 0.1f),
+                        Color(0xFFFFFFFF)
+                    )
                 )
             )
-        },
-        containerColor = Color(0xFFFFFFFF)
-    ) { innerPadding ->
-
-        // Improved Custom Dialog
-        if (showAddDeckDialog) {
-            AddDeckDialog(
-                deckName = deckName,
-                onDeckNameChange = { deckName = it },
-                deckDescription = deckDescription,
-                onDeckDescriptionChange = { deckDescription = it },
-                isPublic = isPublic,
-                onPrivacyChange = { isPublic = it },
-                onCancel = {
-                    showAddDeckDialog = false
-                    deckName = ""
-                    deckDescription = ""
-                    isPublic = true
-                },
-                onSave = {
-                    // TODO: Save logic
-                    coroutineScope.launch {
-                        try {
-                            val token = TokenManager(context).getAccessToken()
-                            val request = CreateDeckRequest(
-                                name = deckName,
-                                description = deckDescription.ifBlank { null },
-                                visibility = if (isPublic) 1 else 0
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.School,
+                                contentDescription = null,
+                                tint = Color(0xFF191647),
+                                modifier = Modifier.size(28.dp)
                             )
-                            val response = RetrofitClient.api.createDeck("Bearer $token", request)
-                            if (response.isSuccessful && response.body()?.isSuccess == true) {
-                                viewModel.reloadDecks(context)
-                                Toast.makeText(context, "Tạo deck thành công", Toast.LENGTH_SHORT).show()
-                                showAddDeckDialog = false
-                                deckName = ""
-                                deckDescription = ""
-                                isPublic = true
-                            } else {
-                                Toast.makeText(context, "Tạo deck thất bại", Toast.LENGTH_SHORT).show()
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "Flashcard",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    },
+                    actions = {
+                        FloatingActionButton(
+                            onClick = { showAddDeckDialog = true },
+                            containerColor = Color(0xFF191647),
+                            contentColor = Color.White,
+                            modifier = Modifier
+                                .size(48.dp)
+                                .padding(end = 8.dp),
+                            elevation = FloatingActionButtonDefaults.elevation(
+                                defaultElevation = 6.dp,
+                                pressedElevation = 8.dp
+                            )
+                        ) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = "Add Deck",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        titleContentColor = Color(0xFF191647)
+                    )
+                )
+            },
+            containerColor = Color.Transparent
+        ) { innerPadding ->
+
+            // Dialog không thay đổi
+            if (showAddDeckDialog) {
+                AddDeckDialog(
+                    deckName = deckName,
+                    onDeckNameChange = { deckName = it },
+                    deckDescription = deckDescription,
+                    onDeckDescriptionChange = { deckDescription = it },
+                    isPublic = isPublic,
+                    onPrivacyChange = { isPublic = it },
+                    onCancel = {
+                        showAddDeckDialog = false
+                        deckName = ""
+                        deckDescription = ""
+                        isPublic = true
+                    },
+                    onSave = {
+                        coroutineScope.launch {
+                            try {
+                                val token = TokenManager(context).getAccessToken()
+                                val request = CreateDeckRequest(
+                                    name = deckName,
+                                    description = deckDescription.ifBlank { null },
+                                    visibility = if (isPublic) 1 else 0
+                                )
+                                val response = RetrofitClient.api.createDeck("Bearer $token", request)
+                                if (response.isSuccessful && response.body()?.isSuccess == true) {
+                                    viewModel.reloadDecks(context)
+                                    Toast.makeText(context, "Tạo deck thành công", Toast.LENGTH_SHORT).show()
+                                    showAddDeckDialog = false
+                                    deckName = ""
+                                    deckDescription = ""
+                                    isPublic = true
+                                } else {
+                                    Toast.makeText(context, "Tạo deck thất bại", Toast.LENGTH_SHORT).show()
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                Toast.makeText(context, "Lỗi mạng: ${e.message}", Toast.LENGTH_SHORT).show()
                             }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            Toast.makeText(context, "Lỗi mạng: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    enabledSave = deckName.isNotBlank()
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                // Header Section với thông tin thống kê
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.White
+                    ),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 4.dp
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    text = "Welcome back!",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF191647)
+                                )
+                                Text(
+                                    text = "Continue your learning journey",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color(0xFF666666),
+                                    modifier = Modifier.padding(top = 2.dp)
+                                )
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .size(70.dp)
+                                    .background(
+                                        brush = Brush.radialGradient(
+                                            colors = listOf(
+                                                Color(0xFF94D5F5),
+                                                Color(0xFF94D5F5).copy(alpha = 0.7f)
+                                            )
+                                        ),
+                                        shape = CircleShape
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column {
+                                    Text(
+                                        text = "${deckList.size}",
+                                        style = MaterialTheme.typography.headlineSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF191647)
+                                    )
+                                    Text(
+                                        text = "Decks",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color(0xFF666666),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+//                        // Thống kê nhanh
+//                        Row(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            horizontalArrangement = Arrangement.SpaceEvenly
+//                        ) {
+//                            StatCard(
+//                                icon = Icons.Default.LibraryBooks,
+//                                title = "Decks",
+//                                value = "${deckList.size}",
+//                                color = Color(0xFF4CAF50)
+//                            )
+//                            StatCard(
+//                                icon = Icons.Default.TrendingUp,
+//                                title = "Tiến độ",
+//                                value = "85%",
+//                                color = Color(0xFF2196F3)
+//                            )
+//                            StatCard(
+//                                icon = Icons.Default.EmojiEvents,
+//                                title = "Thành tích",
+//                                value = "12",
+//                                color = Color(0xFFFF9800)
+//                            )
+//                        }
+                    }
+                }
+
+                // Deck List Section
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Your decks",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF191647)
+                        )
+                    }
+                }
+
+                // Deck Cards
+                SwipeRefresh(
+                    state = swipeRefreshState,
+                    onRefresh = {
+                        isRefreshing = true
+                        viewModel.reloadDecks(context)
+                        CoroutineScope(Dispatchers.Main).launch {
+                            delay(500)
+                            isRefreshing = false
                         }
                     }
-                },
-                enabledSave = deckName.isNotBlank()
+                ) {
+                    if (deckList.isEmpty()) {
+                        // Empty state
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(120.dp)
+                                    .background(
+                                        color = Color(0xFF94D5F5).copy(alpha = 0.1f),
+                                        shape = CircleShape
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.LibraryBooks,
+                                    contentDescription = null,
+                                    tint = Color(0xFF94D5F5),
+                                    modifier = Modifier.size(48.dp)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            Text(
+                                text = "You don't have any deck yet",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF191647)
+                            )
+
+                            Text(
+                                text = "Create your first deck to start your learning journey",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color(0xFF666666),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+
+                            Spacer(modifier = Modifier.height(32.dp))
+
+                            Button(
+                                onClick = { showAddDeckDialog = true },
+                                shape = RoundedCornerShape(16.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF94D5F5),
+                                    contentColor = Color(0xFF191647)
+                                ),
+                                modifier = Modifier.height(48.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Add,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    "Create Your First Deck",
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            contentPadding = PaddingValues(bottom = 16.dp)
+                        ) {
+                            items(deckList) { deck ->
+                                DeckCard(deck = deck)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatCard(
+    icon: ImageVector,
+    title: String,
+    value: String,
+    color: Color
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.width(80.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .background(
+                    color = color.copy(alpha = 0.1f),
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(20.dp)
             )
         }
 
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(16.dp)
-        ) {
-            Text(
-                "Home",
-                style = MaterialTheme.typography.titleMedium,
-                color = Color(0xFF191647),
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+        Spacer(modifier = Modifier.height(8.dp))
 
-            LazyColumn {
-                items(deckList) { deck ->
-                    DeckCard(deck)
-                    Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF191647)
+        )
+
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color(0xFF666666),
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun EnhancedDeckCard(deck: Any) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .animateContentSize()
+            .clickable { /* TODO: Navigate to deck details */ },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp,
+            hoveredElevation = 6.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = "Deck Name", // Replace with deck.name
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF191647)
+                    )
+
+                    Text(
+                        text = "Deck description here...", // Replace with deck.description
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF666666),
+                        modifier = Modifier.padding(top = 4.dp),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                // Privacy indicator
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color(0xFF4CAF50).copy(alpha = 0.1f),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Public, // Use Icons.Default.Lock for private
+                            contentDescription = null,
+                            tint = Color(0xFF4CAF50),
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "Public", // Replace with actual visibility
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color(0xFF4CAF50),
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Stats row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Style,
+                        contentDescription = null,
+                        tint = Color(0xFF94D5F5),
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "24 thẻ", // Replace with actual card count
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF666666)
+                    )
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Schedule,
+                        contentDescription = null,
+                        tint = Color(0xFF94D5F5),
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "2 ngày trước", // Replace with actual last studied
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF666666)
+                    )
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .background(
+                                color = Color(0xFF4CAF50),
+                                shape = CircleShape
+                            )
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "75%", // Replace with actual progress
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF666666),
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             }
         }
@@ -217,14 +652,14 @@ fun AddDeckDialog(
 
                 // Title
                 Text(
-                    text = "Tạo Deck Mới",
+                    text = "Create New Deck",
                     style = MaterialTheme.typography.headlineSmall,
                     color = Color(0xFF191647),
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
-                    text = "Thêm một deck flashcard mới để bắt đầu học tập",
+                    text = "Add a new flashcard deck to start studying",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFF666666),
                     textAlign = TextAlign.Center,
@@ -237,8 +672,8 @@ fun AddDeckDialog(
                 OutlinedTextField(
                     value = deckName,
                     onValueChange = onDeckNameChange,
-                    label = { Text("Tên Deck") },
-                    placeholder = { Text("Nhập tên deck...") },
+                    label = { Text("Deck title") },
+                    placeholder = { Text("Enter deck title...") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -262,8 +697,8 @@ fun AddDeckDialog(
                 OutlinedTextField(
                     value = deckDescription,
                     onValueChange = onDeckDescriptionChange,
-                    label = { Text("Mô tả") },
-                    placeholder = { Text("Nhập mô tả deck...") },
+                    label = { Text("Description") },
+                    placeholder = { Text("Enter deck description ...") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -325,7 +760,7 @@ fun AddDeckDialog(
                         ) {
                             Icon(Icons.Default.Save, contentDescription = "Save", modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Tạo Deck", fontWeight = FontWeight.Bold)
+                            Text("Add Deck", fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -343,7 +778,7 @@ fun PrivacySelector(isPublic: Boolean, onPrivacyChange: (Boolean) -> Unit) {
         ) {
             Icon(Icons.Default.Visibility, contentDescription = "Visibility", tint = Color(0xFF94D5F5))
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Quyền riêng tư", fontWeight = FontWeight.Medium, color = Color(0xFF191647))
+            Text("Privacy", fontWeight = FontWeight.Medium, color = Color(0xFF191647))
         }
 
         Row(
