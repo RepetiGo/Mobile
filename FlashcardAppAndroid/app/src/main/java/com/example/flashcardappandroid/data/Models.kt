@@ -69,11 +69,28 @@ data class ResetPasswordRequest(
     val code: String
 )
 
-//Resend Dto
-data class ResendResponse(
+//Deck Dto
+data class CreateDeckRequest(
+    val name: String,
+    val description: String? = null,
+    val visibility: Int
+)
+
+data class ServiceResult<T>(
     val isSuccess: Boolean,
-    val data: RefreshData,
-    val errorMessage: String,
+    val data: T?,
+    val errorMessage: String?,
     val statusCode: Int
+)
+
+data class DeckResponse(
+    val id: Int,
+    val name: String,
+    val description: String?,   // nullable
+    val visibility: Int,
+    val ratings: Int,
+    val createdAt: String,
+    val updatedAt: String?,     // nullable
+    val userId: String
 )
 

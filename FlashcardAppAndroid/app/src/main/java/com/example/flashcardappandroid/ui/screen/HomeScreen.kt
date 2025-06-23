@@ -8,7 +8,9 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.flashcardappandroid.ui.flashcardscreen.DeckListScreen
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -31,9 +33,9 @@ fun HomeScreen(navController: NavController) {
             }
         }
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+        Box(modifier = Modifier.fillMaxSize().padding(bottom = 56.dp) ) {
             when (selectedIndex) {
-                0 -> FlashcardScreen()
+                0 -> DeckListScreen(navController)
                 1 -> QuizScreen()
                 2 -> GroupChatScreen()
                 3 -> ProfileScreen(navController)

@@ -38,4 +38,14 @@ interface AuthApiService {
     @POST("api/users/reset-password")
     suspend fun resetPassword(@Body request: ResetPasswordRequest): Response<Any>
 
+    @GET("api/decks")
+    suspend fun getDecks(
+        @Header("Authorization") token: String
+    ): Response<ServiceResult<List<DeckResponse>>>
+
+    @POST("api/decks")
+    suspend fun createDeck(
+        @Header("Authorization") token: String,
+        @Body request: CreateDeckRequest
+    ): Response<ServiceResult<DeckResponse>>
 }
