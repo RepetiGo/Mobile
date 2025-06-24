@@ -65,4 +65,5 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.accompanist.swiperefresh)
+    implementation(libs.coil.compose)
 }

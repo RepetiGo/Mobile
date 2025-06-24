@@ -94,3 +94,41 @@ data class DeckResponse(
     val userId: String
 )
 
+data class DeleteResponse(
+    val isSuccess: Boolean,
+    val data: String,
+    val errorMessage: String,
+    val statusCode: Int
+)
+
+//Card Dto
+data class BaseResponse<T>(
+    val isSuccess: Boolean,
+    val data: T,
+    val errorMessage: String?,
+    val statusCode: Int
+)
+
+data class CardResponse(
+    val id: Int,
+    val frontText: String,
+    val backText: String,
+    val nextReview: String,
+    val repetition: Int,
+    val status: Int,
+    val learningStep: Int,
+    val lastReviewed: String,
+    val imageUrl: String?,
+    val imagePublicId: String?,
+    val createdAt: String,
+    val updatedAt: String,
+    val deckId: Int
+)
+
+//Review Dto
+data class ReviewReQuest(
+    val rating: Int,
+)
+
+
+

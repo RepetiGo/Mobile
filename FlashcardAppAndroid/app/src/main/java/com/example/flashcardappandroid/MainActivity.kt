@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.flashcardappandroid.network.RetrofitClient
+import com.example.flashcardappandroid.ui.flashcardscreen.FlashcardStudyScreen
+import com.example.flashcardappandroid.ui.flashcardscreen.RepetitionScreen
 import com.example.flashcardappandroid.ui.screen.LoginScreen
 import com.example.flashcardappandroid.ui.screen.RegisterScreen
 import com.example.flashcardappandroid.ui.screen.HomeScreen
@@ -32,6 +34,14 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("forgot-password") { ForgotPasswordScreen(navController) }
                     composable("reset-password") { ResetPasswordScreen(navController) }
+                    composable("flashcard_study/{deckId}") { backStackEntry ->
+                        val deckId = backStackEntry.arguments?.getString("deckId")?.toIntOrNull()
+                        deckId?.let { FlashcardStudyScreen(deckId = it, navController = navController) }
+                    }
+                    composable("repetition/{deckId}") { backStackEntry ->
+                        val deckId = backStackEntry.arguments?.getString("deckId")?.toIntOrNull()
+                        deckId?.let { RepetitionScreen(deckId = it, navController = navController) }
+                    }
                 }
             }
         }

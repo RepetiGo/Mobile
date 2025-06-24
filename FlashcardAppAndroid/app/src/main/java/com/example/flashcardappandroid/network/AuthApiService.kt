@@ -3,9 +3,12 @@ package com.example.flashcardappandroid.network
 import com.example.flashcardappandroid.data.*
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.GET
+import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface AuthApiService {
@@ -48,4 +51,39 @@ interface AuthApiService {
         @Header("Authorization") token: String,
         @Body request: CreateDeckRequest
     ): Response<ServiceResult<DeckResponse>>
+
+    @PUT("/api/decks/{deckId}")
+    suspend fun updateDeck(
+        @Header("Authorization") token: String,
+        @Path("deckId") deckId: Int,
+        @Body request: CreateDeckRequest
+    ): Response<ServiceResult<DeckResponse>>
+
+    @DELETE("/api/decks/{deckId}")
+    suspend fun deleteDeck(
+        @Header("Authorization") token: String,
+        @Path("deckId") deckId: Int
+    ): Response<DeleteResponse>
+
+    @GET("/api/cards/decks/{deckId}/cards")
+    suspend fun getCardsByDeckId(
+        @Header("Authorization") token: String,
+        @Path("deckId") deckId: Int
+    ): Response<BaseResponse<List<CardResponse>>>
+
+    @GET("/api/cards/decks/{deckId}/due")
+    suspend fun getDueCards(
+        @Header("Authorization") token: String,
+        @Path("deckId") deckId: Int
+    ): Response<BaseResponse<List<CardResponse>>>
+
+    @POST("/api/cards/decks/{deckId}/cards/{cardId}/review")
+    suspend fun reviewCard(
+        @Header("Authorization") token: String,
+        @Path("deckId") deckId: Int,
+        @Path("cardId") cardId: Int,
+        @Body request: ReviewReQuest
+    ): Response<BaseResponse<Unit>>
+
+
 }
