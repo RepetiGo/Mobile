@@ -157,7 +157,7 @@ fun FlashcardStudyScreen(deckId: Int, navController: NavController) {
             onBackClick = { navController.popBackStack() }
         )
 
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(40.dp))
         // Main Content
         Box(
             modifier = Modifier
@@ -197,7 +197,7 @@ fun FlashcardStudyScreen(deckId: Int, navController: NavController) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(500.dp)
+                        .height(480.dp)
                         .scale(0.95f)
                         .alpha(0.7f)
                         .offset(y = 8.dp),
@@ -329,7 +329,7 @@ fun ImprovedFlashcard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(560.dp)
+            .height(480.dp)
             .graphicsLayer {
                 rotationY = rotation
                 cameraDistance = 12f * density

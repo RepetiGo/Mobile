@@ -75,9 +75,9 @@ interface AuthApiService {
     suspend fun getDueCards(
         @Header("Authorization") token: String,
         @Path("deckId") deckId: Int
-    ): Response<BaseResponse<List<CardResponse>>>
+    ): Response<BaseResponse<List<ReviewResponse>>>
 
-    @POST("/api/cards/decks/{deckId}/cards/{cardId}/review")
+    @PUT("/api/cards/decks/{deckId}/cards/{cardId}/review")
     suspend fun reviewCard(
         @Header("Authorization") token: String,
         @Path("deckId") deckId: Int,

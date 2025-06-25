@@ -130,5 +130,31 @@ data class ReviewReQuest(
     val rating: Int,
 )
 
+data class ReviewResponse(
+    val id: Int,
+    val frontText: String,
+    val backText: String,
+    val nextReview: String,
+    val reviewTimeResult: ReviewTimeResult,
+    val repetition: Int,
+    val status: Int,
+    val easinessFactor: Float,
+    val learningStep: Int,
+    val lastReviewed: String?,
+    val imageUrl: String?,
+    val imagePublicId: String?,
+    val createdAt: String,
+    val updatedAt: String?,
+    val deckId: Int
+)
+
+data class ReviewTimeResult(
+    val again: String,
+    val hard: String,
+    val good: String,
+    val easy: String
+)
+
+
 
 

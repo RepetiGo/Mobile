@@ -319,25 +319,25 @@ fun DeckListScreen(
                     }
                 }
 
-                // Deck List Section
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Your decks",
-                            style = MaterialTheme.typography.titleMedium.copy(fontSize = 24.sp),
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF191647)
-                        )
-                    }
-                }
+//                // Deck List Section
+//                Column(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(horizontal = 16.dp, vertical = 8.dp)
+//                ) {
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        horizontalArrangement = Arrangement.SpaceBetween,
+//                        verticalAlignment = Alignment.CenterVertically
+//                    ) {
+//                        Text(
+//                            text = "Your decks",
+//                            style = MaterialTheme.typography.titleMedium.copy(fontSize = 24.sp),
+//                            fontWeight = FontWeight.SemiBold,
+//                            color = Color(0xFF191647)
+//                        )
+//                    }
+//                }
 
                 // Deck Cards
                 SwipeRefresh(
