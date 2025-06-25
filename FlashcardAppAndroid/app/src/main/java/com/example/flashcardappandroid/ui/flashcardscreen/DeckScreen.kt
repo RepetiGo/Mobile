@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.items
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,6 +31,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Description
@@ -84,6 +84,9 @@ import com.example.flashcardappandroid.data.DeckResponse
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.lazy.rememberLazyListState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -105,6 +108,8 @@ fun DeckListScreen(
     var selectedDeck by remember { mutableStateOf<DeckResponse?>(null) }
     var showEditDeckDialog by remember { mutableStateOf(false) }
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
+    val publicDecks = deckList.filter { it.visibility == 1 }
+    val privateDecks = deckList.filter { it.visibility == 0 }
 
     LaunchedEffect(Unit) {
         viewModel.loadDecksIfNeeded(context)
@@ -287,30 +292,30 @@ fun DeckListScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-//                        // Thống kê nhanh
-//                        Row(
-//                            modifier = Modifier.fillMaxWidth(),
-//                            horizontalArrangement = Arrangement.SpaceEvenly
-//                        ) {
-//                            StatCard(
-//                                icon = Icons.Default.LibraryBooks,
-//                                title = "Decks",
-//                                value = "${deckList.size}",
-//                                color = Color(0xFF4CAF50)
-//                            )
-//                            StatCard(
-//                                icon = Icons.Default.TrendingUp,
-//                                title = "Tiến độ",
-//                                value = "85%",
-//                                color = Color(0xFF2196F3)
-//                            )
-//                            StatCard(
-//                                icon = Icons.Default.EmojiEvents,
-//                                title = "Thành tích",
-//                                value = "12",
-//                                color = Color(0xFFFF9800)
-//                            )
-//                        }
+                        // Thống kê nhanh
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            StatCard(
+                                icon = Icons.Default.LibraryBooks,
+                                title = "Decks",
+                                value = "${deckList.size}",
+                                color = Color(0xFF4CAF50)
+                            )
+                            StatCard(
+                                icon = Icons.Default.TrendingUp,
+                                title = "Tiến độ",
+                                value = "85%",
+                                color = Color(0xFF2196F3)
+                            )
+                            StatCard(
+                                icon = Icons.Default.EmojiEvents,
+                                title = "Thành tích",
+                                value = "12",
+                                color = Color(0xFFFF9800)
+                            )
+                        }
                     }
                 }
 
@@ -327,7 +332,7 @@ fun DeckListScreen(
                     ) {
                         Text(
                             text = "Your decks",
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleMedium.copy(fontSize = 24.sp),
                             fontWeight = FontWeight.SemiBold,
                             color = Color(0xFF191647)
                         )
@@ -413,20 +418,24 @@ fun DeckListScreen(
                             }
                         }
                     } else {
-                        LazyColumn(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            contentPadding = PaddingValues(bottom = 16.dp)
-                        ) {
-                            items(deckList) { deck ->
-                                DeckCard(
-                                    deck = deck,
-                                    onClick = {
-                                        selectedDeck = deck
-                                        showSheet = true
-                                    }
-                                )
-                            }
+                        Column {
+                            DeckSectionRow(
+                                title = "Public Decks",
+                                decks = publicDecks,
+                                onDeckClick = {
+                                    selectedDeck = it
+                                    showSheet = true
+                                }
+                            )
+
+                            DeckSectionRow(
+                                title = "Private Decks",
+                                decks = privateDecks,
+                                onDeckClick = {
+                                    selectedDeck = it
+                                    showSheet = true
+                                }
+                            )
                         }
                     }
                 }
@@ -1042,6 +1051,63 @@ fun DeckOptionsBottomSheet(
         }
     }
 }
+
+@Composable
+fun DeckSectionRow(
+    title: String,
+    decks: List<DeckResponse>,
+    onDeckClick: (DeckResponse) -> Unit
+) {
+    val listState = rememberLazyListState()
+    val flingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
+
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Spacer(modifier = Modifier.width(24.dp))
+            Icon(
+                imageVector = if (title == "Public Decks")
+                    Icons.Default.Public
+                else
+                    Icons.Default.Lock,
+                contentDescription = title,
+                tint = if (title == "Public Decks")
+                    Color(0xFF4CAF50)
+                else
+                    Color(0xFFFF9800),
+                modifier = Modifier.size(20.dp)
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelMedium.copy(fontSize = 20.sp),
+                color = if (title == "Public Decks")
+                    Color(0xFF4CAF50)
+                else
+                    Color(0xFFFF9800),
+                fontWeight = FontWeight.Medium
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        LazyRow(
+            state = listState,
+            flingBehavior = flingBehavior,
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(decks) { deck ->
+                DeckCard(
+                    deck = deck,
+                    onClick = { onDeckClick(deck) },
+                )
+            }
+        }
+    }
+}
+
 
 
 

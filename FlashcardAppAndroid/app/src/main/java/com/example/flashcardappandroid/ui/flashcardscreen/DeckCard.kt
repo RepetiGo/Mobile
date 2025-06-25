@@ -49,6 +49,7 @@ fun DeckCard(
             .fillMaxWidth()
             .height(160.dp)
             .clickable { onClick() }
+            .width(320.dp)
     ) {
         Box(
             modifier = Modifier.fillMaxSize()

@@ -1,7 +1,11 @@
 package com.example.flashcardappandroid.ui.flashcardscreen
 
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -56,13 +60,19 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.em
+import kotlinx.coroutines.delay
+import kotlin.math.sin
+import kotlin.random.Random
 
 @Composable
 fun FlashcardStudyScreen(deckId: Int, navController: NavController) {
@@ -114,7 +124,11 @@ fun FlashcardStudyScreen(deckId: Int, navController: NavController) {
     if (currentIndex >= cards.size) {
         CongratulationScreen(
             totalCards = cards.size,
-            onBack = { navController.popBackStack() }
+            onBack = { navController.popBackStack() },
+            onStudyAgain = {
+                currentIndex = 0
+                isFlipped = false
+            }
         )
         return
     }
@@ -315,7 +329,7 @@ fun ImprovedFlashcard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(500.dp)
+            .height(560.dp)
             .graphicsLayer {
                 rotationY = rotation
                 cameraDistance = 12f * density
@@ -556,8 +570,35 @@ fun LoadingScreen() {
 @Composable
 fun CongratulationScreen(
     totalCards: Int,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onStudyAgain: () -> Unit
 ) {
+    // Animation states
+    var isVisible by remember { mutableStateOf(false) }
+    var showConfetti by remember { mutableStateOf(false) }
+
+    val scale by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "scale"
+    )
+
+    val alpha by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0f,
+        animationSpec = tween(800),
+        label = "alpha"
+    )
+
+    LaunchedEffect(Unit) {
+        delay(200)
+        isVisible = true
+        delay(600)
+        showConfetti = true
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -566,66 +607,277 @@ fun CongratulationScreen(
                     colors = listOf(
                         Color(0xFF667eea),
                         Color(0xFF764ba2),
-                        Color(0xFF667eea)
-                    )
+                        Color(0xFF2E1065)
+                    ),
+                    radius = 800f
                 )
-            ),
-        contentAlignment = Alignment.Center
+            )
     ) {
+        // Floating particles background
+        if (showConfetti) {
+            FloatingParticles()
+        }
+
+        // Main content
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(32.dp)
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp)
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    this.alpha = alpha
+                }
         ) {
-            // Animated celebration emoji
+            // Trophy icon with glow effect
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(120.dp)
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                Color.Yellow.copy(alpha = 0.3f),
+                                Color.Transparent
+                            ),
+                            radius = 100f
+                        ),
+                        shape = CircleShape
+                    )
+            ) {
+                Text(
+                    text = "🏆",
+                    fontSize = 80.sp,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Success message with gradient text effect
             Text(
-                text = "🎉",
-                fontSize = 80.sp,
-                modifier = Modifier.padding(bottom = 16.dp)
+                text = "Perfect!",
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.ExtraBold
+                ),
+                color = Color.White,
+                modifier = Modifier
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.White.copy(alpha = 0.1f),
+                                Color.Transparent
+                            )
+                        ),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
+            Spacer(modifier = Modifier.height(12.dp))
+
             Text(
-                text = "Congratulations!",
-                style = MaterialTheme.typography.headlineLarge,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
+                text = "Study Session Complete",
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.White.copy(alpha = 0.9f),
+                fontWeight = FontWeight.Medium
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = "You've completed all $totalCards cards!",
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.White.copy(alpha = 0.9f),
-                textAlign = TextAlign.Center
-            )
+            // Stats card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White.copy(alpha = 0.15f)
+                ),
+                shape = RoundedCornerShape(20.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        StatItem(
+                            icon = "📚",
+                            value = totalCards.toString(),
+                            label = "Cards Studied"
+                        )
+
+                        StatItem(
+                            icon = "⭐",
+                            value = "100%",
+                            label = "Completion"
+                        )
+
+                        StatItem(
+                            icon = "🎯",
+                            value = "Great!",
+                            label = "Performance"
+                        )
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Button(
-                onClick = onBack,
-                modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color(0xFF667eea)
-                ),
-                shape = RoundedCornerShape(28.dp)
+            // Action buttons
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Back to Deck",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                // Primary button - Study Again
+                Button(
+                    onClick = onStudyAgain,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color(0xFF667eea)
+                    ),
+                    shape = RoundedCornerShape(28.dp),
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 8.dp
+                    )
+                ) {
+                    Icon(
+                        Icons.Default.Refresh,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Study Again",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Secondary button - Back to Deck
+                OutlinedButton(
+                    onClick = onBack,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .height(48.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color.White
+                    ),
+                    border = BorderStroke(
+                        width = 2.dp,
+                        color = Color.White.copy(alpha = 0.7f)
+                    ),
+                    shape = RoundedCornerShape(24.dp)
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Back to Deck",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun StatItem(
+    icon: String,
+    value: String,
+    label: String
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = icon,
+            fontSize = 24.sp
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.White,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.White.copy(alpha = 0.8f)
+        )
+    }
+}
+
+@Composable
+fun FloatingParticles() {
+    val particles = remember {
+        List(20) {
+            ParticleState(
+                x = Random.nextFloat(),
+                y = Random.nextFloat(),
+                size = Random.nextFloat() * 8f + 4f,
+                speed = Random.nextFloat() * 0.02f + 0.01f,
+                emoji = listOf("✨", "⭐", "🎉", "💫", "🌟").random()
+            )
+        }
+    }
+
+    var animationTime by remember { mutableStateOf(0f) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            withFrameNanos { frameTime ->
+                animationTime = frameTime / 1_000_000_000f
+            }
+        }
+    }
+
+    Canvas(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        particles.forEach { particle ->
+            val currentY = (particle.y + animationTime * particle.speed) % 1f
+            val currentX = particle.x + sin(animationTime * 2f + particle.x * 10f) * 0.1f
+
+            drawContext.canvas.nativeCanvas.apply {
+                val paint = android.graphics.Paint().apply {
+                    textSize = particle.size * density
+                    textAlign = android.graphics.Paint.Align.CENTER
+                }
+                drawText(
+                    particle.emoji,
+                    currentX * size.width,
+                    currentY * size.height,
+                    paint
                 )
             }
         }
     }
 }
+
+data class ParticleState(
+    val x: Float,
+    val y: Float,
+    val size: Float,
+    val speed: Float,
+    val emoji: String
+)
 
 

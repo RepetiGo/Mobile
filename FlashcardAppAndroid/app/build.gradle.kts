@@ -66,4 +66,5 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.accompanist.swiperefresh)
     implementation(libs.coil.compose)
+    implementation(libs.androidx.foundation)
 }
