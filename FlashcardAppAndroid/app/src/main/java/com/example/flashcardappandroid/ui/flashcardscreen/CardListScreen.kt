@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -486,20 +487,18 @@ fun CardListScreen(deckId: Int, navController: NavController) {
 private fun EnhancedCardItem(
     card: CardResponse,
     onEdit: () -> Unit,
-    onDelete: () -> Unit)
+    onDelete: () -> Unit,)
 {
+    var isExpanded by remember { mutableStateOf(false) }
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp,
-            hoveredElevation = 6.dp
         ),
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize()
+            .clickable { isExpanded = !isExpanded }
     ) {
         Column(
             modifier = Modifier.padding(20.dp)
@@ -559,43 +558,48 @@ private fun EnhancedCardItem(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Back text with icon
-            Row(
-                verticalAlignment = Alignment.Top,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .background(
-                            color = Color(0xFF4CAF50).copy(alpha = 0.1f),
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
+            if (isExpanded) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    verticalAlignment = Alignment.Top,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "A",
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4CAF50)
-                    )
-                }
+                    // A icon
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .background(
+                                color = Color(0xFF4CAF50).copy(alpha = 0.1f),
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "A",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF4CAF50)
+                        )
+                    }
 
-                Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
 
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "Answer",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = Color(0xFF4CAF50),
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                    Text(
-                        text = card.backText,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFF666666),
-                        lineHeight = 18.sp
-                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Answer",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color(0xFF4CAF50),
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                        Text(
+                            text = card.backText,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color(0xFF666666),
+                            lineHeight = 18.sp
+                        )
+                    }
                 }
             }
 
