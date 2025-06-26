@@ -177,7 +177,7 @@ fun DeckListScreen(
             containerColor = Color.Transparent
         ) { innerPadding ->
 
-            // Dialog không thay đổi
+            // Dialog
             if (showAddDeckDialog) {
                 AddDeckDialog(
                     deckName = deckName,
@@ -536,7 +536,9 @@ fun DeckListScreen(
             ) {
                 DeckOptionsBottomSheet(
                     onDismiss = { showSheet = false },
-                    onView = { /* TODO */ },
+                    onView = {
+                        navController.navigate("deck_cards/${selectedDeck!!.id}")
+                        showSheet = false },
                     onFlashcard = {
                         navController.navigate("flashcard_study/${selectedDeck!!.id}")
                         showSheet = false },

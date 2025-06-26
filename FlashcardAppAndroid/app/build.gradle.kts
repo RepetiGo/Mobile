@@ -67,4 +67,5 @@ dependencies {
     implementation(libs.accompanist.swiperefresh)
     implementation(libs.coil.compose)
     implementation(libs.androidx.foundation)
+    implementation(libs.androidx.activity.compose.v172)
 }
