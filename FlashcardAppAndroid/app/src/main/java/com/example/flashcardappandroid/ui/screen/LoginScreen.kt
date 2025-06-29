@@ -1,6 +1,7 @@
 
 package com.example.flashcardappandroid.ui.screen
 
+import DeckListViewModel
 import android.widget.Toast
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
@@ -66,7 +67,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import com.example.flashcardappandroid.network.RetrofitClient.api
 import com.example.flashcardappandroid.ui.profilescreen.UserSession
 
 @Composable
@@ -291,7 +291,7 @@ fun LoginScreen(navController: NavController) {
                                                 loginResponse.data.id
                                             )
                                             val token = tokenManager.getAccessToken()
-                                            val profileResponse = RetrofitClient.api.getProfile("Bearer $token") // hoặc getUserProfile()
+                                            val profileResponse = RetrofitClient.api.getProfile("Bearer $token") // getUserProfile()
                                             if (profileResponse.isSuccessful) {
                                                 val profile = profileResponse.body()?.data
                                                 if (profile != null) {

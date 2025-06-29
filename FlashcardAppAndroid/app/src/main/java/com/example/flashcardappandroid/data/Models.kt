@@ -88,7 +88,8 @@ data class DeckResponse(
     val name: String,
     val description: String?,   // nullable
     val visibility: Int,
-    val ratings: Int,
+    val downloads: Int,
+    val forkedFromUsername: String?,
     val createdAt: String,
     val updatedAt: String?,     // nullable
     val userId: String
@@ -160,7 +161,7 @@ data class ProfileResponse(
     val id: String,
     val userName: String,
     val email: String,
-    val avatarUrl: String,
+    val avatarUrl: String
 )
 
 

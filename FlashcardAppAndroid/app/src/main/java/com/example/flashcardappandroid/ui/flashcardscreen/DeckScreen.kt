@@ -73,11 +73,6 @@ import com.example.flashcardappandroid.data.CreateDeckRequest
 import com.example.flashcardappandroid.data.TokenManager
 import com.example.flashcardappandroid.network.RetrofitClient
 import kotlinx.coroutines.launch
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import com.example.flashcardappandroid.data.DeckResponse
@@ -102,7 +97,6 @@ fun DeckListScreen(
     val deckList = viewModel.deckList
     val coroutineScope = rememberCoroutineScope()
     var isRefreshing by remember { mutableStateOf(false) }
-    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
     val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(false) }
     var selectedDeck by remember { mutableStateOf<DeckResponse?>(null) }
@@ -223,101 +217,101 @@ fun DeckListScreen(
                 )
             }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                // Header Section với thông tin thống kê
-                Card(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 4.dp
-                    )
+                        .fillMaxSize()
+                        .padding(innerPadding)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(20.dp)
+                    // Header Section với thông tin thống kê
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White
+                        ),
+                        elevation = CardDefaults.cardElevation(
+                            defaultElevation = 4.dp
+                        )
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                        Column(
+                            modifier = Modifier.padding(20.dp)
                         ) {
-                            Column {
-                                Text(
-                                    text = "Welcome back!",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF191647)
-                                )
-                                Text(
-                                    text = "Continue your learning journey",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color(0xFF666666),
-                                    modifier = Modifier.padding(top = 2.dp)
-                                )
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .size(70.dp)
-                                    .background(
-                                        brush = Brush.radialGradient(
-                                            colors = listOf(
-                                                Color(0xFF94D5F5),
-                                                Color(0xFF94D5F5).copy(alpha = 0.7f)
-                                            )
-                                        ),
-                                        shape = CircleShape
-                                    ),
-                                contentAlignment = Alignment.Center
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column {
                                     Text(
-                                        text = "${deckList.size}",
-                                        style = MaterialTheme.typography.headlineSmall,
+                                        text = "Welcome back!",
+                                        style = MaterialTheme.typography.titleLarge,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF191647),
-                                        textAlign = TextAlign.Center,  // Căn giữa văn bản
-                                        modifier = Modifier.fillMaxWidth()  // Bắt buộc để textAlign hoạt động
+                                        color = Color(0xFF191647)
+                                    )
+                                    Text(
+                                        text = "Explore other people's decks",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = Color(0xFF666666),
+                                        modifier = Modifier.padding(top = 2.dp)
                                     )
                                 }
+                                Box(
+                                    modifier = Modifier
+                                        .size(70.dp)
+                                        .background(
+                                            brush = Brush.radialGradient(
+                                                colors = listOf(
+                                                    Color(0xFF94D5F5),
+                                                    Color(0xFF94D5F5).copy(alpha = 0.7f)
+                                                )
+                                            ),
+                                            shape = CircleShape
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = "${deckList.size}",
+                                            style = MaterialTheme.typography.headlineSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF191647),
+                                            textAlign = TextAlign.Center,  // Căn giữa văn bản
+                                            modifier = Modifier.fillMaxWidth()  // Bắt buộc để textAlign hoạt động
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Thống kê nhanh
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                StatCard(
+                                    icon = Icons.Default.LibraryBooks,
+                                    title = "Decks",
+                                    value = "${deckList.size}",
+                                    color = Color(0xFF4CAF50)
+                                )
+                                StatCard(
+                                    icon = Icons.Default.TrendingUp,
+                                    title = "Tiến độ",
+                                    value = "85%",
+                                    color = Color(0xFF2196F3)
+                                )
+                                StatCard(
+                                    icon = Icons.Default.EmojiEvents,
+                                    title = "Thành tích",
+                                    value = "12",
+                                    color = Color(0xFFFF9800)
+                                )
                             }
                         }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Thống kê nhanh
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            StatCard(
-                                icon = Icons.Default.LibraryBooks,
-                                title = "Decks",
-                                value = "${deckList.size}",
-                                color = Color(0xFF4CAF50)
-                            )
-                            StatCard(
-                                icon = Icons.Default.TrendingUp,
-                                title = "Tiến độ",
-                                value = "85%",
-                                color = Color(0xFF2196F3)
-                            )
-                            StatCard(
-                                icon = Icons.Default.EmojiEvents,
-                                title = "Thành tích",
-                                value = "12",
-                                color = Color(0xFFFF9800)
-                            )
-                        }
                     }
-                }
 
 //                // Deck List Section
 //                Column(
@@ -339,107 +333,95 @@ fun DeckListScreen(
 //                    }
 //                }
 
-                // Deck Cards
-                SwipeRefresh(
-                    state = swipeRefreshState,
-                    onRefresh = {
-                        isRefreshing = true
-                        viewModel.reloadDecks(context)
-                        CoroutineScope(Dispatchers.Main).launch {
-                            delay(500)
-                            isRefreshing = false
-                        }
-                    }
-                ) {
-                    if (deckList.isEmpty()) {
-                        // Empty state
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(32.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Box(
+                    // Deck Cards
+                        if (deckList.isEmpty()) {
+                            // Empty state
+                            Column(
                                 modifier = Modifier
-                                    .size(120.dp)
-                                    .background(
-                                        color = Color(0xFF94D5F5).copy(alpha = 0.1f),
-                                        shape = CircleShape
-                                    ),
-                                contentAlignment = Alignment.Center
+                                    .fillMaxSize()
+                                    .padding(32.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.LibraryBooks,
-                                    contentDescription = null,
-                                    tint = Color(0xFF94D5F5),
-                                    modifier = Modifier.size(48.dp)
-                                )
-                            }
+                                Box(
+                                    modifier = Modifier
+                                        .size(120.dp)
+                                        .background(
+                                            color = Color(0xFF94D5F5).copy(alpha = 0.1f),
+                                            shape = CircleShape
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.LibraryBooks,
+                                        contentDescription = null,
+                                        tint = Color(0xFF94D5F5),
+                                        modifier = Modifier.size(48.dp)
+                                    )
+                                }
 
-                            Spacer(modifier = Modifier.height(24.dp))
+                                Spacer(modifier = Modifier.height(24.dp))
 
-                            Text(
-                                text = "You don't have any deck yet",
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF191647)
-                            )
-
-                            Text(
-                                text = "Create your first deck to start your learning journey",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color(0xFF666666),
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(top = 8.dp)
-                            )
-
-                            Spacer(modifier = Modifier.height(32.dp))
-
-                            Button(
-                                onClick = { showAddDeckDialog = true },
-                                shape = RoundedCornerShape(16.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF94D5F5),
-                                    contentColor = Color(0xFF191647)
-                                ),
-                                modifier = Modifier.height(48.dp)
-                            ) {
-                                Icon(
-                                    Icons.Default.Add,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    "Create Your First Deck",
-                                    fontWeight = FontWeight.Bold
+                                    text = "You don't have any deck yet",
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF191647)
+                                )
+
+                                Text(
+                                    text = "Create your first deck to start your learning journey",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color(0xFF666666),
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(top = 8.dp)
+                                )
+
+                                Spacer(modifier = Modifier.height(32.dp))
+
+                                Button(
+                                    onClick = { showAddDeckDialog = true },
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFF94D5F5),
+                                        contentColor = Color(0xFF191647)
+                                    ),
+                                    modifier = Modifier.height(48.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Add,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        "Create Your First Deck",
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        } else {
+                            Column {
+                                DeckSectionRow(
+                                    title = "Public Decks",
+                                    decks = publicDecks,
+                                    onDeckClick = {
+                                        selectedDeck = it
+                                        showSheet = true
+                                    }
+                                )
+
+                                DeckSectionRow(
+                                    title = "Private Decks",
+                                    decks = privateDecks,
+                                    onDeckClick = {
+                                        selectedDeck = it
+                                        showSheet = true
+                                    }
                                 )
                             }
                         }
-                    } else {
-                        Column {
-                            DeckSectionRow(
-                                title = "Public Decks",
-                                decks = publicDecks,
-                                onDeckClick = {
-                                    selectedDeck = it
-                                    showSheet = true
-                                }
-                            )
-
-                            DeckSectionRow(
-                                title = "Private Decks",
-                                decks = privateDecks,
-                                onDeckClick = {
-                                    selectedDeck = it
-                                    showSheet = true
-                                }
-                            )
-                        }
-                    }
                 }
-            }
         }
 
         if (showEditDeckDialog && selectedDeck != null) {
@@ -489,43 +471,37 @@ fun DeckListScreen(
         }
 
         if (showDeleteConfirmDialog && selectedDeck != null) {
-            AlertDialog(
-                onDismissRequest = { showDeleteConfirmDialog = false },
-                confirmButton = {
-                    TextButton(onClick = {
-                        coroutineScope.launch {
-                            try {
-                                val token = TokenManager(context).getAccessToken()
-                                val response = RetrofitClient.api.deleteDeck(
-                                    token = "Bearer $token",
-                                    deckId = selectedDeck!!.id
-                                )
+            DeleteConfirmationDialog(
+                showDialog = showDeleteConfirmDialog,
+                selectedDeck = selectedDeck,
+                onDismiss = {
+                    showDeleteConfirmDialog = false
+                    selectedDeck = null
+                },
+                onConfirm = {
+                    coroutineScope.launch {
+                        try {
+                            val token = TokenManager(context).getAccessToken()
+                            val response = RetrofitClient.api.deleteDeck(
+                                token = "Bearer $token",
+                                deckId = selectedDeck!!.id
+                            )
 
-                                if (response.isSuccessful || response.code() == 404) {
-                                    Toast.makeText(context, "Deck deleted successfully", Toast.LENGTH_SHORT).show()
-                                    viewModel.reloadDecks(context)
-                                } else {
-                                    Toast.makeText(context, "Delete failed", Toast.LENGTH_SHORT).show()
-                                }
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                Toast.makeText(context, "Lỗi mạng: ${e.message}", Toast.LENGTH_SHORT).show()
-                            } finally {
-                                showDeleteConfirmDialog = false
-                                selectedDeck = null
+                            if (response.isSuccessful || response.code() == 404) {
+                                Toast.makeText(context, "Deck deleted successfully!", Toast.LENGTH_SHORT).show()
+                                viewModel.reloadDecks(context)
+                            } else {
+                                Toast.makeText(context, "Delete failed, please try again", Toast.LENGTH_SHORT).show()
                             }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            Toast.makeText(context, "Lỗi mạng: ${e.message}", Toast.LENGTH_SHORT).show()
+                        } finally {
+                            showDeleteConfirmDialog = false
+                            selectedDeck = null
                         }
-                    }) {
-                        Text("Yes")
                     }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDeleteConfirmDialog = false }) {
-                        Text("No")
-                    }
-                },
-                title = { Text("Confirm Delete") },
-                text = { Text("Are you sure you want to delete this deck?") }
+                }
             )
         }
 
@@ -1105,6 +1081,160 @@ fun DeckSectionRow(
                     deck = deck,
                     onClick = { onDeckClick(deck) },
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun DeleteConfirmationDialog(
+    showDialog: Boolean,
+    selectedDeck: DeckResponse?,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    if (showDialog) {
+        Dialog(
+            onDismissRequest = onDismiss
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 24.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Warning icon with animation
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .background(
+                                Color(0xFFFF6B6B).copy(alpha = 0.1f),
+                                CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.Warning,
+                            contentDescription = null,
+                            tint = Color(0xFFFF6B6B),
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Title
+                    Text(
+                        text = "Xác nhận xóa",
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp
+                        ),
+                        color = Color(0xFF2D3748),
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Deck name highlight
+                    if (selectedDeck != null) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFFF7FAFC)
+                            )
+                        ) {
+                            Text(
+                                text = "\"${selectedDeck.name}\"",
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.SemiBold
+                                ),
+                                color = Color(0xFF667eea),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Description
+                    Text(
+                        text = "Are you sure you want to delete this deck set?\n\nThis action cannot be undone.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF718096),
+                        textAlign = TextAlign.Center,
+                        lineHeight = 20.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    // Buttons
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        // Cancel button
+                        OutlinedButton(
+                            onClick = onDismiss,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = Color(0xFF4A5568)
+                            )
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Cancel",
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp
+                            )
+                        }
+
+                        // Delete button
+                        Button(
+                            onClick = onConfirm,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFFFF6B6B),
+                                contentColor = Color.White
+                            ),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Delete",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                }
             }
         }
     }

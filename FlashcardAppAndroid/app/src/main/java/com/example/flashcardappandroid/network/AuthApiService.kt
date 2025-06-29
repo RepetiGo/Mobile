@@ -121,4 +121,16 @@ interface AuthApiService {
     suspend fun getProfile(
         @Header("Authorization") token: String
     ): Response<BaseResponse<ProfileResponse>>
+
+    @GET("api/decks/shared")
+    suspend fun getsharedDecks(
+        @Header("Authorization") token: String
+    ): Response<ServiceResult<List<DeckResponse>>>
+
+    @POST("api/decks/shared/{deckId}/clone")
+    suspend fun cloneDeck(
+        @Header("Authorization") token: String,
+        @Path("deckId") deckId: Int,
+        @Body request: CreateDeckRequest
+    ): Response<ServiceResult<DeckResponse>>
 }

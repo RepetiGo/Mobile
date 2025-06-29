@@ -77,6 +77,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.text.style.TextOverflow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -447,34 +448,30 @@ fun CardListScreen(deckId: Int, navController: NavController) {
                 }
             }
             if (cardToDelete != null) {
-                AlertDialog(
-                    onDismissRequest = { cardToDelete = null },
-                    title = { Text("Xác nhận xoá") },
-                    text = { Text("Bạn có chắc muốn xoá thẻ này không?") },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            coroutineScope.launch {
+                DeleteCardConfirmationDialog(
+                    cardToDelete = cardToDelete,
+                    onDismiss = { cardToDelete = null },
+                    onConfirm = {
+                        coroutineScope.launch {
+                            try {
                                 val token = TokenManager(context).getAccessToken()
                                 val response = RetrofitClient.api.deleteCard(
                                     token = "Bearer $token",
                                     deckId = deckId,
                                     cardId = cardToDelete!!.id
                                 )
-                                if (response.isSuccessful) {
+                                if (response.isSuccessful || response.code() == 404) {
                                     cards = cards.filter { it.id != cardToDelete!!.id }
-                                    Toast.makeText(context, "Đã xoá thẻ", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Đã xóa thẻ thành công!", Toast.LENGTH_SHORT).show()
                                 } else {
-                                    Toast.makeText(context, "Xoá thất bại", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Xóa thất bại, vui lòng thử lại", Toast.LENGTH_SHORT).show()
                                 }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                Toast.makeText(context, "Lỗi mạng: ${e.message}", Toast.LENGTH_SHORT).show()
+                            } finally {
                                 cardToDelete = null
                             }
-                        }) {
-                            Text("Xoá", color = Color.Red)
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { cardToDelete = null }) {
-                            Text("Huỷ")
                         }
                     }
                 )
@@ -865,6 +862,229 @@ fun AddCardDialog(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(action, fontWeight = FontWeight.Bold)
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DeleteCardConfirmationDialog(
+    cardToDelete: CardResponse?,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    if (cardToDelete != null) {
+        Dialog(
+            onDismissRequest = onDismiss
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 24.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Warning icon with animation
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .background(
+                                Color(0xFFFF6B6B).copy(alpha = 0.1f),
+                                CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.DeleteForever,
+                            contentDescription = null,
+                            tint = Color(0xFFFF6B6B),
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Title
+                    Text(
+                        text = "Confirm card deletion",
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp
+                        ),
+                        color = Color(0xFF2D3748),
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Card preview
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFFF8F9FA)
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(20.dp)
+                        ) {
+                            // Front side preview
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .background(
+                                            Color(0xFF667eea),
+                                            CircleShape
+                                        )
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Front text:",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color(0xFF718096),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = cardToDelete.frontText,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color(0xFF2D3748),
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // Back side preview
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .background(
+                                            Color(0xFF48BB78),
+                                            CircleShape
+                                        )
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Back text:",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color(0xFF718096),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = cardToDelete.backText,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color(0xFF2D3748),
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // Warning message
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                Color(0xFFFFF5F5),
+                                RoundedCornerShape(12.dp)
+                            )
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = null,
+                            tint = Color(0xFFFF6B6B),
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = "This action cannot be undone.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFFFF6B6B),
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    // Buttons
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        // Cancel button
+                        OutlinedButton(
+                            onClick = onDismiss,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = Color(0xFF4A5568)
+                            )
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Cancle",
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp
+                            )
+                        }
+
+                        // Delete button
+                        Button(
+                            onClick = onConfirm,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFFFF6B6B),
+                                contentColor = Color.White
+                            ),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Delete",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
                         }
                     }
                 }

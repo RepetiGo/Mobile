@@ -1,4 +1,4 @@
-package com.example.flashcardappandroid.ui.flashcardscreen
+package com.example.flashcardappandroid.ui.sharedscreen
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

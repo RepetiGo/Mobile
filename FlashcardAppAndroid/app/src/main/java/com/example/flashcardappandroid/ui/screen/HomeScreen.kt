@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,21 +34,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.flashcardappandroid.ui.aigenscreen.AiGenScreen
+import com.example.flashcardappandroid.ui.sharedscreen.SharedScreen
 import com.example.flashcardappandroid.ui.flashcardscreen.DeckListScreen
 import com.example.flashcardappandroid.ui.profilescreen.ProfileScreen
 import com.example.flashcardappandroid.ui.quizscreen.QuizScreen
 
 @Composable
-fun HomeScreen(navController: NavController) {
-    var selectedIndex by remember { mutableStateOf(0) }
+fun HomeScreen(navController: NavController, initialTab: Int = 0) {
+    var selectedIndex by rememberSaveable { mutableStateOf(initialTab) }
 
     val items = listOf("Trang chủ", "Quiz", "AiGen", "Profile")
     val icons = listOf(Icons.Default.Home, Icons.Default.Quiz, Icons.Default.Chat, Icons.Default.Person)
     val screens = listOf<@Composable () -> Unit>(
         { DeckListScreen(navController) },
         { QuizScreen() },
-        { AiGenScreen() },
+        { SharedScreen(navController) },
         { ProfileScreen(navController) }
     )
 
