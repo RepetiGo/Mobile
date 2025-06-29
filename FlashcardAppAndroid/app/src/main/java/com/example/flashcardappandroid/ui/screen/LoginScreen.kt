@@ -66,6 +66,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import com.example.flashcardappandroid.network.RetrofitClient.api
+import com.example.flashcardappandroid.ui.profilescreen.UserSession
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -76,6 +78,7 @@ fun LoginScreen(navController: NavController) {
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var isFormVisible by remember { mutableStateOf(false) }
+    val tokenManager = remember { TokenManager(context) }
 
     // Animation states
     val alpha by animateFloatAsState(
@@ -287,6 +290,14 @@ fun LoginScreen(navController: NavController) {
                                                 loginResponse.data.refreshToken,
                                                 loginResponse.data.id
                                             )
+                                            val token = tokenManager.getAccessToken()
+                                            val profileResponse = RetrofitClient.api.getProfile("Bearer $token") // hoặc getUserProfile()
+                                            if (profileResponse.isSuccessful) {
+                                                val profile = profileResponse.body()?.data
+                                                if (profile != null) {
+                                                    UserSession.currentUser = profile
+                                                }
+                                            }
                                             Toast.makeText(context, "Welcome back!", Toast.LENGTH_SHORT).show()
                                             navController.navigate("home")
                                         }

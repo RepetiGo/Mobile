@@ -117,4 +117,8 @@ interface AuthApiService {
         @Path("cardId") cardId: Int
     ): Response<BaseResponse<Unit>>
 
+    @GET("/api/profiles/profile")
+    suspend fun getProfile(
+        @Header("Authorization") token: String
+    ): Response<BaseResponse<ProfileResponse>>
 }

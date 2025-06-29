@@ -33,14 +33,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.flashcardappandroid.ui.aigenscreen.AiGenScreen
 import com.example.flashcardappandroid.ui.flashcardscreen.DeckListScreen
+import com.example.flashcardappandroid.ui.profilescreen.ProfileScreen
+import com.example.flashcardappandroid.ui.quizscreen.QuizScreen
 
 @Composable
 fun HomeScreen(navController: NavController) {
     var selectedIndex by remember { mutableStateOf(0) }
 
-    val items = listOf("Trang chủ", "Quiz", "GroupChat", "Profile")
+    val items = listOf("Trang chủ", "Quiz", "AiGen", "Profile")
     val icons = listOf(Icons.Default.Home, Icons.Default.Quiz, Icons.Default.Chat, Icons.Default.Person)
+    val screens = listOf<@Composable () -> Unit>(
+        { DeckListScreen(navController) },
+        { QuizScreen() },
+        { AiGenScreen() },
+        { ProfileScreen(navController) }
+    )
 
     Scaffold(
         bottomBar = {
@@ -81,12 +90,7 @@ fun HomeScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(bottom = 69.dp)
         ) {
-            when (selectedIndex) {
-                0 -> DeckListScreen(navController)
-                1 -> QuizScreen()
-                2 -> GroupChatScreen()
-                3 -> ProfileScreen(navController)
-            }
+            screens[selectedIndex].invoke()
         }
     }
 }

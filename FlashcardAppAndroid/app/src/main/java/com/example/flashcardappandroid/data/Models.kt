@@ -155,6 +155,13 @@ data class ReviewTimeResult(
     val easy: String
 )
 
+//Profile Dto
+data class ProfileResponse(
+    val id: String,
+    val userName: String,
+    val email: String,
+    val avatarUrl: String,
+)
 
 
 
