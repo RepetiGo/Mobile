@@ -126,6 +126,23 @@ data class CardResponse(
     val deckId: Int
 )
 
+//Card Gen Dto
+data class CardGenResponse(
+    val frontText: String,
+    val backText: String,
+    val imageUrl: String?,
+)
+
+data class GenerateRequest(
+    val topic: String,
+    val frontText: String?,
+    val backText: String?,
+    val generateImage: Boolean,
+    val imagePromptLanguage: String,
+    val enhancePrompt: Boolean,
+    val aspectRatio: String
+)
+
 //Review Dto
 data class ReviewReQuest(
     val rating: Int,

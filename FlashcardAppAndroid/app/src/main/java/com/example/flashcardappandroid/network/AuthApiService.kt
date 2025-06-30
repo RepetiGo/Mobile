@@ -133,4 +133,19 @@ interface AuthApiService {
         @Path("deckId") deckId: Int,
         @Body request: CreateDeckRequest
     ): Response<ServiceResult<DeckResponse>>
+
+    @POST("api/cards/generate")
+    suspend fun generateCard(
+        @Body request: GenerateRequest
+    ): Response<BaseResponse<CardGenResponse>>
+
+    @Multipart
+    @POST("/api/cards/decks/{deckId}/cards")
+    suspend fun addGenCard(
+        @Header("Authorization") token: String,
+        @Path("deckId") deckId: Int,
+        @Part("frontText") frontText: RequestBody,
+        @Part("backText") backText: RequestBody,
+        @Part("imageUrl") imageUrl: RequestBody?,
+    ): Response<BaseResponse<Unit>>
 }

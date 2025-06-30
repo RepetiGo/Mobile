@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.flashcardappandroid.network.RetrofitClient
+import com.example.flashcardappandroid.ui.aigenscreen.AiGenCardResultScreen
 import com.example.flashcardappandroid.ui.flashcardscreen.CardListScreen
 import com.example.flashcardappandroid.ui.flashcardscreen.FlashcardStudyScreen
 import com.example.flashcardappandroid.ui.flashcardscreen.RepetitionScreen
@@ -62,6 +63,37 @@ class MainActivity : ComponentActivity() {
                             CardListScreen(deckId = it, navController = navController)
                         }
                     }
+                    composable(
+                        route = "ai_card_result/{topic}/{frontText}/{backText}/{generateImage}",
+                        arguments = listOf(
+                            navArgument("topic") { type = NavType.StringType },
+                            navArgument("frontText") {
+                                type = NavType.StringType
+                                defaultValue = ""
+                            },
+                            navArgument("backText") {
+                                type = NavType.StringType
+                                defaultValue = ""
+                            },
+                            navArgument("generateImage") {
+                                type = NavType.BoolType
+                            }
+                        )
+                    ) { backStackEntry ->
+                        val topic = backStackEntry.arguments?.getString("topic") ?: ""
+                        val frontText = backStackEntry.arguments?.getString("frontText")?.takeIf { it.isNotEmpty() }
+                        val backText = backStackEntry.arguments?.getString("backText")?.takeIf { it.isNotEmpty() }
+                        val generateImage = backStackEntry.arguments?.getBoolean("generateImage") ?: false
+
+                        AiGenCardResultScreen(
+                            topic = topic,
+                            frontText = frontText,
+                            backText = backText,
+                            generateImage = generateImage,
+                            navController = navController
+                        )
+                    }
+
                 }
             }
         }

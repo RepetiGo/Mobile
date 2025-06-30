@@ -34,7 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun DeckCard(
+fun SharedDeckCard(
     deck: DeckResponse,
     onClick: () -> Unit = {}
 ) {
@@ -103,15 +103,13 @@ fun DeckCard(
                                 Color(0xFFFF9800),
                             modifier = Modifier.size(14.dp)
                         )
-                        Text(
-                            text = if (deck.visibility == 1) "Public" else "Private",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = if (deck.visibility == 1)
-                                Color(0xFF4CAF50)
-                            else
-                                Color(0xFFFF9800),
-                            fontWeight = FontWeight.Medium
-                        )
+                        deck.forkedFromUsername?.let {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = Color(0xFF4CAF50)
+                            )
+                        }
                     }
                 }
 

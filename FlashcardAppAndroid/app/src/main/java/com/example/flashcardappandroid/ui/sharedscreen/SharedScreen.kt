@@ -286,7 +286,7 @@ fun SharedScreen(
                                 }
                             }
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
                     }
                 }
 
@@ -364,7 +364,7 @@ fun SharedScreen(
                             contentPadding = PaddingValues(bottom = 16.dp)
                         ) {
                             items(deckList) { deck ->
-                                DeckCard(
+                                SharedDeckCard(
                                     deck = deck,
                                     onClick = {
                                         selectedDeck = deck
