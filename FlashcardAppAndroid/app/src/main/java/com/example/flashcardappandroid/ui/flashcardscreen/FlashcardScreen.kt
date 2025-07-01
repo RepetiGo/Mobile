@@ -117,6 +117,12 @@ fun FlashcardStudyScreen(deckId: Int, navController: NavController) {
         return
     }
 
+    // Check if no cards available
+    if (cards.isEmpty()) {
+        NoCardsScreen(onBack = { navController.popBackStack() })
+        return
+    }
+
     if (currentIndex >= cards.size) {
         CongratulationScreen(
             totalCards = cards.size,
@@ -231,6 +237,79 @@ fun FlashcardStudyScreen(deckId: Int, navController: NavController) {
                 }
             }
         )
+    }
+}
+
+@Composable
+fun NoCardsScreen(onBack: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF667eea),
+                        Color(0xFF764ba2)
+                    )
+                )
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(32.dp)
+        ) {
+            // Empty state icon
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(120.dp)
+                    .background(
+                        Color.White.copy(alpha = 0.2f),
+                        CircleShape
+                    )
+            ) {
+                Text(
+                    text = "📚",
+                    fontSize = 60.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "No cards have been created yet.",
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = onBack,
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color(0xFF667eea)
+                ),
+                shape = RoundedCornerShape(24.dp)
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Back to Deck",
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
     }
 }
 
@@ -860,5 +939,3 @@ data class ParticleState(
     val speed: Float,
     val emoji: String
 )
-
-

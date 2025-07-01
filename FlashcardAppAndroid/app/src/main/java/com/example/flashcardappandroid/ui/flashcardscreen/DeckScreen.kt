@@ -405,16 +405,19 @@ fun DeckListScreen(
                             }
                         } else {
                             Column {
-                                DeckSectionRow(
-                                    title = "Public Decks",
-                                    decks = publicDecks,
-                                    onDeckClick = {
-                                        selectedDeck = it
-                                        showSheet = true
-                                    }
-                                )
+                                if (publicDecks.isNotEmpty()) {
+                                    DeckSectionRow(
+                                        title = "Public Decks",
+                                        decks = publicDecks,
+                                        onDeckClick = {
+                                            selectedDeck = it
+                                            showSheet = true
+                                        }
+                                    )
+                                }
 
-                                DeckSectionRow(
+                                if (privateDecks.isNotEmpty()) {
+                                    DeckSectionRow(
                                     title = "Private Decks",
                                     decks = privateDecks,
                                     onDeckClick = {
@@ -422,6 +425,7 @@ fun DeckListScreen(
                                         showSheet = true
                                     }
                                 )
+                            }
                             }
                         }
                 }
@@ -1099,7 +1103,7 @@ fun DeleteConfirmationDialog(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(1.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = Color.White

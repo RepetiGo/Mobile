@@ -485,10 +485,23 @@ private fun EnhancedCardItem(
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp, // Giảm elevation xuống
+            pressedElevation = 6.dp
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize()
+            .padding(3.dp) // Thêm padding để shadow không bị cắt
             .clickable { isExpanded = !isExpanded }
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFF8FCFF),
+                        Color(0xFFEEF7FF)
+                    )
+                )
+            )
     ) {
         Column(
             modifier = Modifier.padding(20.dp)
@@ -876,7 +889,7 @@ fun DeleteCardConfirmationDialog(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(1.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = Color.White
