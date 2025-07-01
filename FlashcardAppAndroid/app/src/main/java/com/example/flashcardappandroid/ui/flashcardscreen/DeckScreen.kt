@@ -302,7 +302,7 @@ fun DeckListScreen(
                                 )
                                 StatCard(
                                     icon = Icons.Default.TrendingUp,
-                                    title = "LearnedPercent",
+                                    title = "Learned",
                                     value = "${statLearnedPercent}%",
                                     color = Color(0xFF2196F3)
                                 )

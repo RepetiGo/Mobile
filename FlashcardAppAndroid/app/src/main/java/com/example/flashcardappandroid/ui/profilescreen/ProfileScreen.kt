@@ -737,7 +737,7 @@ fun StreakCalendar(dailyReviewCounts: List<DailyReviewCount>) {
 
         // Summary text
         Text(
-            text = "You've been active for $activeDays days this month with $totalReviews total reviews.",
+            text = "You've been active for $activeDays days this year with $totalReviews total reviews.",
             style = MaterialTheme.typography.bodySmall,
             color = Color(0xFF666666),
             textAlign = TextAlign.Center,
