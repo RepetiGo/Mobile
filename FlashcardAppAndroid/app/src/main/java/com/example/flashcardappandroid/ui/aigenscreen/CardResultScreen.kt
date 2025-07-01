@@ -161,7 +161,7 @@ fun AiGenCardResultScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(40.dp))
+                    Spacer(modifier = Modifier.height(80.dp))
 
                     // Enhanced save button
                     EnhancedSaveButton(
