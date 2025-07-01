@@ -1,7 +1,6 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import com.example.flashcardappandroid.data.TokenManager
 import com.example.flashcardappandroid.network.RetrofitClient
 import kotlinx.coroutines.Dispatchers
 import android.content.Context
