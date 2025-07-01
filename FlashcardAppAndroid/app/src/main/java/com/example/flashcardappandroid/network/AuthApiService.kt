@@ -1,5 +1,7 @@
 package com.example.flashcardappandroid.network
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.flashcardappandroid.data.*
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -14,6 +16,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
+import java.time.LocalDate
 
 interface AuthApiService {
     @POST("api/users/login")
@@ -150,4 +153,9 @@ interface AuthApiService {
         @Body body: RequestBody
     ): Response<Unit>
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    @GET("api/stats")
+    suspend fun getStats(
+        @Query("year") year: Int = LocalDate.now().year
+    ): Response<ServiceResult<ActivityStatsResponse>>
 }

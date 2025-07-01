@@ -1,7 +1,9 @@
 package com.example.flashcardappandroid.ui.flashcardscreen
 
 import DeckListViewModel
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -81,6 +83,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.lazy.rememberLazyListState
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeckListScreen(
@@ -93,6 +96,8 @@ fun DeckListScreen(
     var isPublic by remember { mutableStateOf(true) } // true = public (1), false = private (0)
     val context = LocalContext.current
     val deckList = viewModel.deckList
+    var statDailyAverage = viewModel.statDailyAverage
+    var statLearnedPercent = viewModel.statLearnedPercent
     val coroutineScope = rememberCoroutineScope()
     var isRefreshing by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -297,14 +302,14 @@ fun DeckListScreen(
                                 )
                                 StatCard(
                                     icon = Icons.Default.TrendingUp,
-                                    title = "Tiến độ",
-                                    value = "85%",
+                                    title = "LearnedPercent",
+                                    value = "${statLearnedPercent}%",
                                     color = Color(0xFF2196F3)
                                 )
                                 StatCard(
                                     icon = Icons.Default.EmojiEvents,
-                                    title = "Thành tích",
-                                    value = "12",
+                                    title = "DailyAverage",
+                                    value = statDailyAverage,
                                     color = Color(0xFFFF9800)
                                 )
                             }

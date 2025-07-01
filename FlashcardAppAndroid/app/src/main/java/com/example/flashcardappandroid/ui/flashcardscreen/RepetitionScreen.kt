@@ -1,5 +1,6 @@
 package com.example.flashcardappandroid.ui.flashcardscreen
 
+import DeckListViewModel
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -62,11 +63,12 @@ import kotlinx.coroutines.launch
 import kotlin.math.sin
 import kotlin.random.Random
 import androidx.compose.ui.geometry.Offset
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.flashcardappandroid.data.ReviewResponse
 import com.example.flashcardappandroid.data.ReviewTimeResult
 
 @Composable
-fun RepetitionScreen(deckId: Int, navController: NavController) {
+fun RepetitionScreen(deckId: Int, navController: NavController, viewModel: DeckListViewModel = viewModel()) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var cards by remember { mutableStateOf<List<ReviewResponse>>(emptyList()) }
@@ -96,7 +98,10 @@ fun RepetitionScreen(deckId: Int, navController: NavController) {
     if (currentIndex >= cards.size) {
         CongratulationScreen2(
             totalCards = cards.size,
-            onBack = { navController.popBackStack() }
+            onBack = {
+                navController.popBackStack()
+                viewModel.reloadDecks(context)
+            }
         )
         return
     }

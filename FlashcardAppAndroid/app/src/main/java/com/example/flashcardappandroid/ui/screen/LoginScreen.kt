@@ -1,7 +1,9 @@
 
 package com.example.flashcardappandroid.ui.screen
 
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,6 +70,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.example.flashcardappandroid.data.UserSession
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun LoginScreen(navController: NavController) {
     val context = LocalContext.current
@@ -307,6 +310,18 @@ fun LoginScreen(navController: NavController) {
                                             if (shareddeckResponse.isSuccessful && shareddeckResponse.body()?.isSuccess == true) {
                                                 UserSession.shareddeckList = shareddeckResponse.body()?.data
                                             }
+
+                                            //load stats
+                                            val response = RetrofitClient.api.getStats()
+
+                                            if (response.isSuccessful && response.body()?.isSuccess == true) {
+                                                val stats = response.body()?.data
+                                                val learnedPercent = stats?.dayLearnedPercent ?: 0.0
+                                                val average = stats?.dailyAverage ?: 0.0
+
+                                                UserSession.statLearnedPercent = learnedPercent.toString()
+                                                UserSession.statDailyAverage = average.toInt().toString()
+                                                }
 
                                             Toast.makeText(context, "Welcome back!", Toast.LENGTH_SHORT).show()
                                             navController.navigate("home")

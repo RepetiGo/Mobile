@@ -181,5 +181,18 @@ data class ProfileResponse(
     val avatarUrl: String
 )
 
+//Stats Dto
+data class ActivityStatsResponse(
+    val dailyReviewCounts: List<DailyReviewCount>,
+    val dailyAverage: Double,
+    val dayLearnedPercent: Int,
+    val longestStreak: Int,
+    val currentStreak: Int
+)
+
+data class DailyReviewCount(
+    val date: String,
+    val count: Int
+)
 
 
