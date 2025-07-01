@@ -47,8 +47,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -65,12 +63,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import com.example.flashcardappandroid.data.CreateDeckRequest
-import com.example.flashcardappandroid.data.TokenManager
 import com.example.flashcardappandroid.network.RetrofitClient
 import kotlinx.coroutines.launch
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -81,7 +77,6 @@ import kotlinx.coroutines.delay
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import com.example.flashcardappandroid.data.DeckResponse
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.unit.sp
@@ -192,13 +187,12 @@ fun SharedScreen(
                     onSave = {
                         coroutineScope.launch {
                             try {
-                                val token = TokenManager(context).getAccessToken()
                                 val request = CreateDeckRequest(
                                     name = deckName,
                                     description = deckDescription.ifBlank { null },
                                     visibility = if (isPublic) 1 else 0
                                 )
-                                val response = RetrofitClient.api.cloneDeck("Bearer $token", selectedDeck!!.id, request)
+                                val response = RetrofitClient.api.cloneDeck(selectedDeck!!.id, request)
                                 if (response.isSuccessful && response.body()?.isSuccess == true) {
                                     deckviewModel.reloadDecks(context)
                                     Toast.makeText(context, "get deck successfully", Toast.LENGTH_SHORT).show()
@@ -395,9 +389,7 @@ fun SharedScreen(
                 onSave = {
                     coroutineScope.launch {
                         try {
-                            val token = TokenManager(context).getAccessToken()
                             val response = RetrofitClient.api.updateDeck(
-                                token = "Bearer $token",
                                 deckId = selectedDeck!!.id,
                                 request = CreateDeckRequest(
                                     name = deckName,
@@ -431,9 +423,7 @@ fun SharedScreen(
                     TextButton(onClick = {
                         coroutineScope.launch {
                             try {
-                                val token = TokenManager(context).getAccessToken()
                                 val response = RetrofitClient.api.deleteDeck(
-                                    token = "Bearer $token",
                                     deckId = selectedDeck!!.id
                                 )
 

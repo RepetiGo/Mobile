@@ -1,7 +1,6 @@
 
 package com.example.flashcardappandroid.ui.screen
 
-import DeckListViewModel
 import android.widget.Toast
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
@@ -67,7 +66,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import com.example.flashcardappandroid.ui.profilescreen.UserSession
+import com.example.flashcardappandroid.data.UserSession
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -290,14 +289,25 @@ fun LoginScreen(navController: NavController) {
                                                 loginResponse.data.refreshToken,
                                                 loginResponse.data.id
                                             )
-                                            val token = tokenManager.getAccessToken()
-                                            val profileResponse = RetrofitClient.api.getProfile("Bearer $token") // getUserProfile()
+                                            val profileResponse = RetrofitClient.api.getProfile() // getUserProfile()
                                             if (profileResponse.isSuccessful) {
                                                 val profile = profileResponse.body()?.data
                                                 if (profile != null) {
                                                     UserSession.currentUser = profile
                                                 }
                                             }
+                                            // load decks
+                                            val deckResponse = RetrofitClient.api.getDecks()
+                                            if (deckResponse.isSuccessful && deckResponse.body()?.isSuccess == true) {
+                                                UserSession.deckList = deckResponse.body()?.data
+                                            }
+
+                                            //load shareddecks
+                                            val shareddeckResponse = RetrofitClient.api.getsharedDecks()
+                                            if (shareddeckResponse.isSuccessful && shareddeckResponse.body()?.isSuccess == true) {
+                                                UserSession.shareddeckList = shareddeckResponse.body()?.data
+                                            }
+
                                             Toast.makeText(context, "Welcome back!", Toast.LENGTH_SHORT).show()
                                             navController.navigate("home")
                                         }

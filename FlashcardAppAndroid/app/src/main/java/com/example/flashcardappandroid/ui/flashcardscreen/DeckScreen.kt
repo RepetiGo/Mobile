@@ -195,7 +195,7 @@ fun DeckListScreen(
                                     description = deckDescription.ifBlank { null },
                                     visibility = if (isPublic) 1 else 0
                                 )
-                                val response = RetrofitClient.api.createDeck("Bearer $token", request)
+                                val response = RetrofitClient.api.createDeck(request)
                                 if (response.isSuccessful && response.body()?.isSuccess == true) {
                                     viewModel.reloadDecks(context)
                                     Toast.makeText(context, "Tạo deck thành công", Toast.LENGTH_SHORT).show()
@@ -441,9 +441,7 @@ fun DeckListScreen(
                 onSave = {
                     coroutineScope.launch {
                         try {
-                            val token = TokenManager(context).getAccessToken()
                             val response = RetrofitClient.api.updateDeck(
-                                token = "Bearer $token",
                                 deckId = selectedDeck!!.id,
                                 request = CreateDeckRequest(
                                     name = deckName,
@@ -481,9 +479,7 @@ fun DeckListScreen(
                 onConfirm = {
                     coroutineScope.launch {
                         try {
-                            val token = TokenManager(context).getAccessToken()
                             val response = RetrofitClient.api.deleteDeck(
-                                token = "Bearer $token",
                                 deckId = selectedDeck!!.id
                             )
 

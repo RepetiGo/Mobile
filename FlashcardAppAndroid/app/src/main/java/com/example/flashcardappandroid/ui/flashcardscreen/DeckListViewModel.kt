@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.example.flashcardappandroid.data.DeckResponse
+import com.example.flashcardappandroid.data.UserSession
 
 class DeckListViewModel : ViewModel() {
 
@@ -21,10 +22,16 @@ class DeckListViewModel : ViewModel() {
     fun loadDecksIfNeeded(context: Context) {
         if (isLoaded) return
 
+        // Ưu tiên dùng deckList từ UserSession nếu có
+        UserSession.deckList?.let {
+            deckList = it
+            isLoaded = true
+            return
+        }
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val token = TokenManager(context).getAccessToken()
-                val response = RetrofitClient.api.getDecks("Bearer $token")
+                val response = RetrofitClient.api.getDecks()
                 if (response.isSuccessful && response.body()?.isSuccess == true) {
                     deckList = response.body()?.data ?: emptyList()
                     isLoaded = true
@@ -37,7 +44,19 @@ class DeckListViewModel : ViewModel() {
 
     fun reloadDecks(context: Context) {
         isLoaded = false
-        loadDecksIfNeeded(context)
+        if (isLoaded) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = RetrofitClient.api.getDecks()
+                if (response.isSuccessful && response.body()?.isSuccess == true) {
+                    deckList = response.body()?.data ?: emptyList()
+                    isLoaded = true
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 }
 

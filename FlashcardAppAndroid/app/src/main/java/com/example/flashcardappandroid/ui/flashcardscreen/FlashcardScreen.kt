@@ -99,8 +99,7 @@ fun FlashcardStudyScreen(deckId: Int, navController: NavController) {
 
     LaunchedEffect(deckId) {
         try {
-            val token = TokenManager(context).getAccessToken()
-            val response = RetrofitClient.api.getCardsByDeckId("Bearer $token", deckId)
+            val response = RetrofitClient.api.getCardsByDeckId(deckId)
             if (response.isSuccessful) {
                 cards = response.body()?.data ?: emptyList()
             }
@@ -192,21 +191,6 @@ fun FlashcardStudyScreen(deckId: Int, navController: NavController) {
                     )
                 },
         ) {
-            // Background cards for depth effect
-            if (currentIndex < cards.lastIndex) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(480.dp)
-                        .scale(0.95f)
-                        .alpha(0.7f)
-                        .offset(y = 8.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.8f))
-                ) {}
-            }
-
             // Main flashcard
             ImprovedFlashcard(
                 frontText = card.frontText,

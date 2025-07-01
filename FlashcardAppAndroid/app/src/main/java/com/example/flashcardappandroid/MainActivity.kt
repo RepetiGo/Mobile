@@ -13,6 +13,7 @@ import com.example.flashcardappandroid.ui.aigenscreen.AiGenCardResultScreen
 import com.example.flashcardappandroid.ui.flashcardscreen.CardListScreen
 import com.example.flashcardappandroid.ui.flashcardscreen.FlashcardStudyScreen
 import com.example.flashcardappandroid.ui.flashcardscreen.RepetitionScreen
+import com.example.flashcardappandroid.ui.profilescreen.SettingsScreen
 import com.example.flashcardappandroid.ui.screen.LoginScreen
 import com.example.flashcardappandroid.ui.screen.RegisterScreen
 import com.example.flashcardappandroid.ui.screen.HomeScreen
@@ -20,6 +21,7 @@ import com.example.flashcardappandroid.ui.screen.VerifyScreen
 import com.example.flashcardappandroid.ui.screen.ForgotPasswordScreen
 import com.example.flashcardappandroid.ui.screen.ResetPasswordScreen
 import com.example.flashcardappandroid.ui.theme.FlashcardAppAndroidTheme
+import com.example.flashcardappandroid.ui.profilescreen.EditProfileScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,6 +95,8 @@ class MainActivity : ComponentActivity() {
                             navController = navController
                         )
                     }
+                    composable("settings") { SettingsScreen(navController) }
+                    composable("edit-profile") { EditProfileScreen(navController) }
 
                 }
             }

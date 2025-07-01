@@ -104,7 +104,7 @@ fun CardListScreen(deckId: Int, navController: NavController) {
 
     LaunchedEffect(deckId) {
         val token = TokenManager(context).getAccessToken()
-        val response = RetrofitClient.api.getCardsByDeckId("Bearer $token", deckId)
+        val response = RetrofitClient.api.getCardsByDeckId(deckId)
         if (response.isSuccessful) {
             cards = response.body()?.data ?: emptyList()
             // Get deck info for title
@@ -224,7 +224,6 @@ fun CardListScreen(deckId: Int, navController: NavController) {
 
                             val response = if (isEditing) {
                                 RetrofitClient.api.updateCard(
-                                    token = "Bearer $token",
                                     deckId = deckId,
                                     cardId = editingCard!!.id,
                                     frontText = frontPart,
@@ -233,7 +232,6 @@ fun CardListScreen(deckId: Int, navController: NavController) {
                                 )
                             } else {
                                 RetrofitClient.api.addCard(
-                                    token = "Bearer $token",
                                     deckId = deckId,
                                     frontText = frontPart,
                                     backText = backPart,
@@ -243,7 +241,7 @@ fun CardListScreen(deckId: Int, navController: NavController) {
 
                             if (response.isSuccessful && response.body()?.isSuccess == true) {
                                 Toast.makeText(context, if (isEditing) "Cập nhật thành công" else "Đã thêm flashcard", Toast.LENGTH_SHORT).show()
-                                val refresh = RetrofitClient.api.getCardsByDeckId("Bearer $token", deckId)
+                                val refresh = RetrofitClient.api.getCardsByDeckId(deckId)
                                 if (refresh.isSuccessful) {
                                     cards = refresh.body()?.data ?: emptyList()
                                 }
@@ -326,32 +324,32 @@ fun CardListScreen(deckId: Int, navController: NavController) {
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Quick stats
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            StatCard(
-                                icon = Icons.Default.Style,
-                                title = "Cards",
-                                value = "${cards.size}",
-                                color = Color(0xFF4CAF50)
-                            )
-                            StatCard(
-                                icon = Icons.Default.Visibility,
-                                title = "Reviewed",
-                                value = "${(cards.size * 0.6).toInt()}",
-                                color = Color(0xFF2196F3)
-                            )
-                            StatCard(
-                                icon = Icons.Default.CheckCircle,
-                                title = "Mastered",
-                                value = "${(cards.size * 0.3).toInt()}",
-                                color = Color(0xFFFF9800)
-                            )
-                        }
+//                        Spacer(modifier = Modifier.height(16.dp))
+//
+//                        // Quick stats
+//                        Row(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            horizontalArrangement = Arrangement.SpaceEvenly
+//                        ) {
+//                            StatCard(
+//                                icon = Icons.Default.Style,
+//                                title = "Cards",
+//                                value = "${cards.size}",
+//                                color = Color(0xFF4CAF50)
+//                            )
+//                            StatCard(
+//                                icon = Icons.Default.Visibility,
+//                                title = "Reviewed",
+//                                value = "${(cards.size * 0.6).toInt()}",
+//                                color = Color(0xFF2196F3)
+//                            )
+//                            StatCard(
+//                                icon = Icons.Default.CheckCircle,
+//                                title = "Mastered",
+//                                value = "${(cards.size * 0.3).toInt()}",
+//                                color = Color(0xFFFF9800)
+//                            )
+//                        }
                     }
                 }
 
@@ -454,9 +452,7 @@ fun CardListScreen(deckId: Int, navController: NavController) {
                     onConfirm = {
                         coroutineScope.launch {
                             try {
-                                val token = TokenManager(context).getAccessToken()
                                 val response = RetrofitClient.api.deleteCard(
-                                    token = "Bearer $token",
                                     deckId = deckId,
                                     cardId = cardToDelete!!.id
                                 )

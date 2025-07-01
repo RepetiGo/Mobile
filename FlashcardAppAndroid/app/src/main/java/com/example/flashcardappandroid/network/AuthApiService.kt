@@ -24,8 +24,7 @@ interface AuthApiService {
 
     @POST("api/users/logout")
     suspend fun logOut(
-        @Body body: LogOutRequest,
-        @Header("Authorization") token: String
+        @Body body: RequestBody,
     ): Response<Any>
 
     @POST("api/users/refresh/{userId}")
@@ -47,43 +46,36 @@ interface AuthApiService {
 
     @GET("api/decks")
     suspend fun getDecks(
-        @Header("Authorization") token: String
     ): Response<ServiceResult<List<DeckResponse>>>
 
     @POST("api/decks")
     suspend fun createDeck(
-        @Header("Authorization") token: String,
         @Body request: CreateDeckRequest
     ): Response<ServiceResult<DeckResponse>>
 
     @PUT("/api/decks/{deckId}")
     suspend fun updateDeck(
-        @Header("Authorization") token: String,
         @Path("deckId") deckId: Int,
         @Body request: CreateDeckRequest
     ): Response<ServiceResult<DeckResponse>>
 
     @DELETE("/api/decks/{deckId}")
     suspend fun deleteDeck(
-        @Header("Authorization") token: String,
         @Path("deckId") deckId: Int
     ): Response<DeleteResponse>
 
     @GET("/api/cards/decks/{deckId}/cards")
     suspend fun getCardsByDeckId(
-        @Header("Authorization") token: String,
         @Path("deckId") deckId: Int
     ): Response<BaseResponse<List<CardResponse>>>
 
     @GET("/api/cards/decks/{deckId}/due")
     suspend fun getDueCards(
-        @Header("Authorization") token: String,
         @Path("deckId") deckId: Int
     ): Response<BaseResponse<List<ReviewResponse>>>
 
     @PUT("/api/cards/decks/{deckId}/cards/{cardId}/review")
     suspend fun reviewCard(
-        @Header("Authorization") token: String,
         @Path("deckId") deckId: Int,
         @Path("cardId") cardId: Int,
         @Body request: ReviewReQuest
@@ -92,7 +84,6 @@ interface AuthApiService {
     @Multipart
     @POST("/api/cards/decks/{deckId}/cards")
     suspend fun addCard(
-        @Header("Authorization") token: String,
         @Path("deckId") deckId: Int,
         @Part("frontText") frontText: RequestBody,
         @Part("backText") backText: RequestBody,
@@ -102,7 +93,6 @@ interface AuthApiService {
     @Multipart
     @PUT("/api/cards/decks/{deckId}/cards/{cardId}")
     suspend fun updateCard(
-        @Header("Authorization") token: String,
         @Path("deckId") deckId: Int,
         @Path("cardId") cardId: Int,
         @Part("FrontText") frontText: RequestBody,
@@ -112,24 +102,20 @@ interface AuthApiService {
 
     @DELETE("/api/cards/decks/{deckId}/cards/{cardId}")
     suspend fun deleteCard(
-        @Header("Authorization") token: String,
         @Path("deckId") deckId: Int,
         @Path("cardId") cardId: Int
     ): Response<BaseResponse<Unit>>
 
     @GET("/api/profiles/profile")
     suspend fun getProfile(
-        @Header("Authorization") token: String
     ): Response<BaseResponse<ProfileResponse>>
 
     @GET("api/decks/shared")
     suspend fun getsharedDecks(
-        @Header("Authorization") token: String
     ): Response<ServiceResult<List<DeckResponse>>>
 
     @POST("api/decks/shared/{deckId}/clone")
     suspend fun cloneDeck(
-        @Header("Authorization") token: String,
         @Path("deckId") deckId: Int,
         @Body request: CreateDeckRequest
     ): Response<ServiceResult<DeckResponse>>
@@ -142,10 +128,26 @@ interface AuthApiService {
     @Multipart
     @POST("/api/cards/decks/{deckId}/cards")
     suspend fun addGenCard(
-        @Header("Authorization") token: String,
         @Path("deckId") deckId: Int,
         @Part("frontText") frontText: RequestBody,
         @Part("backText") backText: RequestBody,
         @Part("imageUrl") imageUrl: RequestBody?,
     ): Response<BaseResponse<Unit>>
+
+    @PUT("api/profiles/settings")
+    suspend fun updateSettings(
+        @Body settings: Map<String, @JvmSuppressWildcards Any?>
+    ): retrofit2.Response<Unit>
+
+    @Multipart
+    @POST("api/profiles/avatar")
+    suspend fun uploadAvatar(
+        @Part file: MultipartBody.Part
+    ): Response<Unit>
+
+    @POST("api/profiles/username")
+    suspend fun updateUsername(
+        @Body body: RequestBody
+    ): Response<Unit>
+
 }

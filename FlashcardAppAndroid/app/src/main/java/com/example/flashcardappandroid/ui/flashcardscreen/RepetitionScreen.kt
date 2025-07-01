@@ -77,8 +77,7 @@ fun RepetitionScreen(deckId: Int, navController: NavController) {
     var progress by remember { mutableStateOf(0f) }
 
     LaunchedEffect(deckId) {
-        val token = TokenManager(context).getAccessToken()
-        val response = RetrofitClient.api.getDueCards("Bearer $token", deckId)
+        val response = RetrofitClient.api.getDueCards(deckId)
         if (response.isSuccessful) {
             cards = response.body()?.data ?: emptyList()
         }
@@ -148,10 +147,8 @@ fun RepetitionScreen(deckId: Int, navController: NavController) {
             reviewTime = card.reviewTimeResult,
             onRate = { rating ->
                 coroutineScope.launch {
-                    val token = TokenManager(context).getAccessToken()
                     val request = ReviewReQuest(rating = rating)
                     RetrofitClient.api.reviewCard(
-                        token = "Bearer $token",
                         deckId = deckId,
                         cardId = card.id,
                         request
@@ -335,12 +332,6 @@ fun RepetitionButtons(
                         modifier = Modifier.size(16.dp),
                         color = Color.White.copy(alpha = 0.8f),
                         strokeWidth = 2.dp
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Processing your choice...",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.7f)
                     )
                 }
             }

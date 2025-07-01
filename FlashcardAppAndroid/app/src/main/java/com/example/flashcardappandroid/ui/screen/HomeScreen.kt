@@ -164,18 +164,5 @@ private fun NavigationItem(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-
-        // Indicator dot
-        if (isSelected) {
-            Spacer(modifier = Modifier.height(2.dp))
-            Box(
-                modifier = Modifier
-                    .size(4.dp)
-                    .background(
-                        color = Color(0xFF94D5F5),
-                        shape = CircleShape
-                    )
-            )
-        }
     }
 }
