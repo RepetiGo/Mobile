@@ -1,5 +1,7 @@
 package com.example.flashcardappandroid.ui.screen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
@@ -40,6 +42,7 @@ import com.example.flashcardappandroid.ui.flashcardscreen.DeckListScreen
 import com.example.flashcardappandroid.ui.profilescreen.ProfileScreen
 import com.example.flashcardappandroid.ui.quizscreen.QuizScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(navController: NavController, initialTab: Int = 0) {
     var selectedIndex by rememberSaveable { mutableStateOf(initialTab) }

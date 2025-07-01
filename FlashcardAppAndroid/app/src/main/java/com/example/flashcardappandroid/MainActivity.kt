@@ -1,8 +1,10 @@
 package com.example.flashcardappandroid
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,6 +26,7 @@ import com.example.flashcardappandroid.ui.theme.FlashcardAppAndroidTheme
 import com.example.flashcardappandroid.ui.profilescreen.EditProfileScreen
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         RetrofitClient.init(applicationContext)
         super.onCreate(savedInstanceState)

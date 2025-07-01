@@ -1,6 +1,8 @@
 package com.example.flashcardappandroid.ui.flashcardscreen
 
 import DeckListViewModel
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -67,6 +69,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.flashcardappandroid.data.ReviewResponse
 import com.example.flashcardappandroid.data.ReviewTimeResult
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RepetitionScreen(deckId: Int, navController: NavController, viewModel: DeckListViewModel = viewModel()) {
     val context = LocalContext.current
