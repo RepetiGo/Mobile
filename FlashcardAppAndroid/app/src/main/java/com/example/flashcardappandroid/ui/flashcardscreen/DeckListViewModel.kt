@@ -19,10 +19,10 @@ class DeckListViewModel : ViewModel() {
     var isLoaded by mutableStateOf(false)
         private set
 
-    var statLearnedPercent by mutableStateOf("-")
+    var statLearnedPercent by mutableStateOf("0")
         private set
 
-    var statDailyAverage by mutableStateOf("-")
+    var statDailyAverage by mutableStateOf("0")
         private set
 
     @RequiresApi(Build.VERSION_CODES.O)

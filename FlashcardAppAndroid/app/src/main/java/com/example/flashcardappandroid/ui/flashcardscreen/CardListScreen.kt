@@ -513,7 +513,7 @@ private fun EnhancedCardItem(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(36.dp)
                         .background(
                             color = Color(0xFF94D5F5).copy(alpha = 0.1f),
                             shape = CircleShape
@@ -522,7 +522,7 @@ private fun EnhancedCardItem(
                 ) {
                     Text(
                         text = "Q",
-                        style = MaterialTheme.typography.labelMedium,
+                        style = MaterialTheme.typography.labelMedium.copy(fontSize = 20.sp),
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF94D5F5)
                     )
@@ -531,16 +531,10 @@ private fun EnhancedCardItem(
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "Question",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = Color(0xFF94D5F5),
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
+                    Spacer(modifier = Modifier.width(18.dp))
                     Text(
                         text = card.frontText,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
                         fontWeight = FontWeight.SemiBold,
                         color = Color(0xFF191647),
                         lineHeight = 20.sp
@@ -550,18 +544,16 @@ private fun EnhancedCardItem(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Divider
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(Color(0xFFE0E0E0))
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             // Back text with icon
             if (isExpanded) {
+                // Divider
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(Color(0xFFE0E0E0))
+                )
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
@@ -571,7 +563,7 @@ private fun EnhancedCardItem(
                     // A icon
                     Box(
                         modifier = Modifier
-                            .size(32.dp)
+                            .size(36.dp)
                             .background(
                                 color = Color(0xFF4CAF50).copy(alpha = 0.1f),
                                 shape = CircleShape
@@ -580,7 +572,7 @@ private fun EnhancedCardItem(
                     ) {
                         Text(
                             text = "A",
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelMedium.copy(fontSize = 20.sp),
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF4CAF50)
                         )
@@ -589,16 +581,10 @@ private fun EnhancedCardItem(
                     Spacer(modifier = Modifier.width(12.dp))
 
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Answer",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = Color(0xFF4CAF50),
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
+                        Spacer(modifier = Modifier.width(18.dp))
                         Text(
                             text = card.backText,
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 20.sp),
                             color = Color(0xFF666666),
                             lineHeight = 18.sp
                         )
@@ -606,8 +592,8 @@ private fun EnhancedCardItem(
                 }
             }
 
-            // Optional: Add action buttons row
-            Spacer(modifier = Modifier.height(16.dp))
+            // action buttons row
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),

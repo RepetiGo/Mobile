@@ -73,7 +73,7 @@ fun DeckCard(
                     .fillMaxSize()
                     .padding(20.dp),
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.Start
             ) {
                 // Visibility indicator at top center
                 Box(
@@ -132,7 +132,7 @@ fun DeckCard(
 
                 // Description - centered
                 Text(
-                    text = deck.description?.takeIf { it.isNotBlank() } ?: "Không có mô tả",
+                    text = deck.description?.takeIf { it.isNotBlank() } ?: "No description",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFF666666),
                     maxLines = 2,

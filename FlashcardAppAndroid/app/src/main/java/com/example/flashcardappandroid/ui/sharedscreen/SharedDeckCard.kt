@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Card
@@ -46,7 +47,7 @@ fun SharedDeckCard(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(160.dp)
+            .height(165.dp)
             .clickable { onClick() }
             .width(320.dp)
     ) {
@@ -113,7 +114,7 @@ fun SharedDeckCard(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Title - centered
                 Text(
@@ -138,6 +139,29 @@ fun SharedDeckCard(
                     lineHeight = 20.sp,
                     textAlign = TextAlign.Center
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Bottom section - Downloads count
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Download,
+                            contentDescription = "Downloads",
+                            tint = Color(0xFF4CAF50),
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "${deck.downloads} downloads",
+                            style = MaterialTheme.typography.labelMedium.copy(fontSize = 14.sp),
+                            color = Color(0xFF4CAF50),
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
 
                 Spacer(modifier = Modifier.height(16.dp))
 

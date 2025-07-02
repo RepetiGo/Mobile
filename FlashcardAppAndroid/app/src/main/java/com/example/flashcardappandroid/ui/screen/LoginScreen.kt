@@ -321,6 +321,9 @@ fun LoginScreen(navController: NavController) {
 
                                                 UserSession.statLearnedPercent = learnedPercent.toString()
                                                 UserSession.statDailyAverage = average.toInt().toString()
+                                                }else {
+                                                    UserSession.statLearnedPercent = 0.toString()
+                                                    UserSession.statDailyAverage = 0.toString()
                                                 }
 
                                             Toast.makeText(context, "Welcome back!", Toast.LENGTH_SHORT).show()
