@@ -96,8 +96,8 @@ fun DeckListScreen(
     var isPublic by remember { mutableStateOf(true) } // true = public (1), false = private (0)
     val context = LocalContext.current
     val deckList = viewModel.deckList
-    var statDailyAverage = viewModel.statDailyAverage
-    var statLearnedPercent = viewModel.statLearnedPercent
+    val statDailyAverage = viewModel.statDailyAverage
+    val statLearnedPercent = viewModel.statLearnedPercent
     val coroutineScope = rememberCoroutineScope()
     var isRefreshing by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
